@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "761243124751",
+    "project_id": "musicalike-16ce9",
+    "storage_bucket": "musicalike-16ce9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:761243124751:android:7ecc4908a62262c6d44f7a",
+        "android_client_info": {
+          "package_name": "com.example.musicalike"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxJOV3huYmiga0nE-SBeQj3IMJpqYU2oM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

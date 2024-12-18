@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MusicAlike</string>
+    <string name="Esp">es</string>
+    <string name="error_empty_field">Tienes que escribir en el campo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navi_open">"Abre el drawer"</string>
+    <string name="navi_close">"Cierra el drawer"</string>
+</resources>
