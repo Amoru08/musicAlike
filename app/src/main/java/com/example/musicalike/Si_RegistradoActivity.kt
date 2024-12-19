@@ -39,14 +39,22 @@ class si_registrado : AppCompatActivity() {
         elEmail.setText(emails)
         laContra.setText(providers)
 
+        // Botón de "Atrás" para cerrar sesión y volver a la pantalla principal
         atras.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             goToPrincipio()
         }
 
+        // Botón de "Ir a Home" para iniciar sesión con Firebase y redirigir a Spotify
         ir.setOnClickListener {
             val emailInput = elEmail.text.toString()
             val passwordInput = laContra.text.toString()
+
+            // Verificar si los campos están vacíos
+            if (emailInput.isEmpty() || passwordInput.isEmpty()) {
+                Toast.makeText(this, "Por favor ingrese email y contraseña", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             // Aquí es donde se hace la autenticación con Firebase
             FirebaseAuth.getInstance().signInWithEmailAndPassword(emailInput, passwordInput)
@@ -55,6 +63,7 @@ class si_registrado : AppCompatActivity() {
                         // Si la autenticación con Firebase es exitosa, redirigimos a Spotify
                         goToSpotifyAuth()
                     } else {
+                        // Muestra un mensaje de error si falla la autenticación
                         Toast.makeText(this, "Error al iniciar sesión: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -62,6 +71,7 @@ class si_registrado : AppCompatActivity() {
     }
 
     private fun goToPrincipio() {
+        // Redirigir a la pantalla principal
         val i = Intent(this, MainActivity::class.java)
         startActivity(i)
     }
@@ -80,6 +90,7 @@ class si_registrado : AppCompatActivity() {
                 "&state=$state" +
                 "&scope=user-library-read playlist-read-private user-read-email"
 
+        // Abrir el navegador para que el usuario autorice la aplicación
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
         startActivity(intent)
     }
