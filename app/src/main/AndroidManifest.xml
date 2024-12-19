@@ -46,6 +46,7 @@
         <activity android:name=".no_registrado"/>
         <activity android:name=".SpotifyDetailsActivity" android:exported="true" />
         <activity android:name=".SpotifySearchActivity" android:exported="true" />
+        <activity android:name=".SpotifyUserActivity" android:exported="true"/>
 
     </application>
 

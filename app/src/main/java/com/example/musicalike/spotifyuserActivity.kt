@@ -6,23 +6,27 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
+import androidx.activity.result.contract.ActivityResultContracts
+
+
 
 class SpotifyUserActivity : AppCompatActivity() {
+
+    private val CLIENT_ID = "1d1c94387942461b8bd890e34b4ab6c7"
+    private val CLIENT_SECRET = "785cb1c64f1044b0b0597a035e7c8cd8"
+    private val REDIRECT_URI = "musicalike://callback"  // Callback URI definido en tu app de Spotify
+
+    private val firestoreDb = FirebaseFirestore.getInstance()
 
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var backButton: Button
-
-    // Reemplaza con tus credenciales de Spotify
-    private val CLIENT_ID = "1d1c94387942461b8bd890e34b4ab6c7"
-    private val CLIENT_SECRET = "785cb1c64f1044b0b0597a035e7c8cd8"
-    private val REDIRECT_URI = "musicalike://callback"  // Callback URI definido en tu app de Spotify
 
     // Configura el launcher para manejar la redirección
     private val authenticationLauncher =
@@ -162,8 +166,8 @@ class SpotifyUserActivity : AppCompatActivity() {
                         val userId = jsonObject.getString("id")  // ID del usuario de Spotify
                         val displayName = jsonObject.getString("display_name")  // Nombre de usuario
 
-                        // Guardamos la información del usuario
-                        saveUserDetails(userId, displayName)
+                        // Guardamos la información del usuario en Firebase
+                        saveUserDetailsToFirebase(userId, displayName)
                     }
                 } else {
                     runOnUiThread {
@@ -181,14 +185,22 @@ class SpotifyUserActivity : AppCompatActivity() {
     }
 
     /**
-     * Guarda los detalles del usuario (user_id, display_name) en SharedPreferences
+     * Guarda los detalles del usuario en la base de datos de Firebase
      */
-    private fun saveUserDetails(userId: String, displayName: String) {
-        val sharedPreferences = getSharedPreferences("SpotifyPrefs", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("user_id", userId)
-        editor.putString("display_name", displayName)
-        editor.apply()  // Guarda los datos en SharedPreferences
+    private fun saveUserDetailsToFirebase(userId: String, displayName: String) {
+        val userRef = firestoreDb.collection("SpotifyUser").document(userId)
+        val userData = hashMapOf(
+            "userId" to userId,
+            "displayName" to displayName
+        )
+
+        userRef.set(userData)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Usuario guardado en Firebase.", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al guardar el usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     /**
