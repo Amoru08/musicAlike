@@ -2,6 +2,7 @@ package com.example.musicalike
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -17,34 +18,25 @@ class si_registrado : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("si_registrado", "Entrando en si_registrado")
         setContentView(R.layout.activity_si_registrado)
 
-        // Verificar si el usuario ya está autenticado
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            // Si ya está autenticado, redirigir a HomeActivity
-            goToHome()
-        }
-
-        // Inicializar los elementos de la interfaz
+        // Inicializar elementos
         atras = findViewById(R.id.atras2)
         elEmail = findViewById(R.id.elEmail)
         laContra = findViewById(R.id.laContra)
         ir = findViewById(R.id.irHome)
 
-        // Obtener los extras del Intent
+        // Obtener extras del Intent
         val bundle = intent.extras
-        val email = bundle?.getString("email")
-        val provider = bundle?.getString("provider")
+        Log.d("si_registrado", "Extras recibidos: $bundle")
 
-        // Configurar la vista
-        setup(email ?: "", provider ?: "")
+        // Configurar vistas
+        setup()
     }
 
-    private fun setup(emails: String, providers: String) {
+    private fun setup() {
         title = "Acceder"
-        elEmail.setText(emails)
-        laContra.setText(providers)
 
         // Botón de "Atrás" para cerrar sesión y volver a la pantalla principal
         atras.setOnClickListener {

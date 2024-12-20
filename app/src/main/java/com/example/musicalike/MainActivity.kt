@@ -2,6 +2,7 @@ package com.example.musicalike
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
@@ -24,17 +25,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnIni.setOnClickListener {
+            Log.d("MainActivity", "Botón 'Iniciar Sesión' presionado")
             goToInicioSesion()
         }
+
     }
 
     private fun goToRegister() {
         val i = Intent(this, no_registrado::class.java)
         startActivity(i)
     }
-
     private fun goToInicioSesion() {
+        Log.d("MainActivity", "Navegando a si_registrado")
         val i = Intent(this, si_registrado::class.java)
         startActivity(i)
     }
+
+
 }
