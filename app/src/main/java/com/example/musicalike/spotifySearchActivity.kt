@@ -19,7 +19,8 @@ class SpotifySearchActivity : AppCompatActivity() {
     private lateinit var adapter: SongAdapter
     private val client = OkHttpClient()
 
-    private var accessToken: String? = null // Token de acceso (se almacenará después de la autenticación)
+    private var accessToken: String? = null // Token de acceso
+    private var refreshToken: String? = null // Token de actualización
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +32,11 @@ class SpotifySearchActivity : AppCompatActivity() {
         resultsRecyclerView.layoutManager = LinearLayoutManager(this)
         resultsRecyclerView.adapter = adapter
 
+        // Obtener el query y los tokens de la Intent
         val query = intent.getStringExtra("QUERY")
+        accessToken = intent.getStringExtra("ACCESS_TOKEN")
+        refreshToken = intent.getStringExtra("REFRESH_TOKEN")
+
         if (!query.isNullOrEmpty()) {
             searchSpotify(query)
             searchField.setText(query)
@@ -41,51 +46,57 @@ class SpotifySearchActivity : AppCompatActivity() {
     // Función para realizar la búsqueda en Spotify
     private fun searchSpotify(query: String) {
         if (accessToken == null) {
-            // Si el accessToken es nulo, intenta obtenerlo nuevamente (puede ser un error 401 si ha caducado)
+            // Si el accessToken es nulo, intenta obtenerlo nuevamente
             refreshAccessToken()
         }
 
-        val encodedQuery = URLEncoder.encode(query, "UTF-8")
-        val url = "https://api.spotify.com/v1/search?q=$encodedQuery&type=track&limit=10"
+        if (accessToken != null) { // Asegúrate de que el token no sea nulo
+            val encodedQuery = URLEncoder.encode(query, "UTF-8")
+            val url = "https://api.spotify.com/v1/search?q=$encodedQuery&type=track&limit=10"
 
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("Authorization", "Bearer $accessToken") // Asegúrate de usar el token de acceso en la cabecera
-            .build()
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $accessToken") // Asegúrate de usar el token de acceso en la cabecera
+                .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(this@SpotifySearchActivity, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    val tracks = parseTracks(responseBody)
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
                     runOnUiThread {
-                        if (tracks.isEmpty()) {
-                            Toast.makeText(this@SpotifySearchActivity, "No se encontraron resultados", Toast.LENGTH_SHORT).show()
-                        } else {
-                            adapter.updateResults(tracks)
-                        }
+                        Toast.makeText(this@SpotifySearchActivity, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    if (response.code == 401) {
-                        // Si el código de respuesta es 401, significa que el token ha caducado. Intenta renovarlo.
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        val responseBody = response.body?.string()
+                        val tracks = parseTracks(responseBody)
                         runOnUiThread {
-                            Toast.makeText(this@SpotifySearchActivity, "Token expirado, renovando...", Toast.LENGTH_SHORT).show()
+                            if (tracks.isEmpty()) {
+                                Toast.makeText(this@SpotifySearchActivity, "No se encontraron resultados", Toast.LENGTH_SHORT).show()
+                            } else {
+                                adapter.updateResults(tracks)
+                            }
                         }
-                        refreshAccessToken()  // Intenta renovar el token
                     } else {
-                        runOnUiThread {
-                            Toast.makeText(this@SpotifySearchActivity, "Error en la búsqueda: ${response.code}", Toast.LENGTH_SHORT).show()
+                        if (response.code == 401) {
+                            // Si el código de respuesta es 401, significa que el token ha caducado. Intenta renovarlo.
+                            runOnUiThread {
+                                Toast.makeText(this@SpotifySearchActivity, "Token expirado, renovando...", Toast.LENGTH_SHORT).show()
+                            }
+                            refreshAccessToken()  // Intenta renovar el token
+                        } else {
+                            runOnUiThread {
+                                Toast.makeText(this@SpotifySearchActivity, "Error en la búsqueda: ${response.code}", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
+            })
+        } else {
+            runOnUiThread {
+                Toast.makeText(this@SpotifySearchActivity, "No se pudo obtener un token de acceso", Toast.LENGTH_SHORT).show()
             }
-        })
+        }
     }
 
     // Función para parsear la respuesta y extraer los resultados de las canciones
@@ -110,15 +121,12 @@ class SpotifySearchActivity : AppCompatActivity() {
 
     // Función para renovar el token de acceso
     private fun refreshAccessToken() {
-        val sharedPreferences = getSharedPreferences("SpotifyPrefs", MODE_PRIVATE)
-        val refreshToken = sharedPreferences.getString("refresh_token", null)
-
         if (refreshToken != null) {
             val formBody = FormBody.Builder()
                 .add("grant_type", "refresh_token")
-                .add("refresh_token", refreshToken)
-                .add("client_id", "YOUR_CLIENT_ID") // Reemplaza con tu CLIENT_ID
-                .add("client_secret", "YOUR_CLIENT_SECRET") // Reemplaza con tu CLIENT_SECRET
+                .add("refresh_token", refreshToken!!)
+                .add("client_id", "1d1c94387942461b8bd890e34b4ab6c7") // Reemplaza con tu CLIENT_ID
+                .add("client_secret", "785cb1c64f1044b0b0597a035e7c8cd8") // Reemplaza con tu CLIENT_SECRET
                 .build()
 
             val request = Request.Builder()
@@ -131,29 +139,35 @@ class SpotifySearchActivity : AppCompatActivity() {
                     val responseBody = response.body?.string()
                     if (response.isSuccessful && responseBody != null) {
                         val jsonObject = JSONObject(responseBody)
-                        accessToken = jsonObject.getString("access_token")
-                        // Actualiza el token en las preferencias compartidas
-                        val editor = sharedPreferences.edit()
-                        editor.putString("access_token", accessToken)
-                        editor.apply()
+                        val newAccessToken = jsonObject.getString("access_token")
 
-                        // Ahora vuelve a realizar la búsqueda con el nuevo token
-                        val query = searchField.text.toString()
-                        if (query.isNotEmpty()) {
-                            searchSpotify(query)
+                        // Actualiza el accessToken y renueva la búsqueda
+                        accessToken = newAccessToken
+                        runOnUiThread {
+                            // Actualiza el token almacenado, y vuelve a realizar la búsqueda
+                            Toast.makeText(this@SpotifySearchActivity, "Token renovado", Toast.LENGTH_SHORT).show()
+                            val query = searchField.text.toString()
+                            if (query.isNotEmpty()) {
+                                searchSpotify(query)
+                            }
                         }
                     } else {
-                        Log.e("SpotifySearch", "Error al renovar el token: ${response.code}")
+                        runOnUiThread {
+                            Toast.makeText(this@SpotifySearchActivity, "Error al renovar el token: ${response.code}", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
                 override fun onFailure(call: Call, e: IOException) {
-                    Log.e("SpotifySearch", "Error de red al renovar token: ${e.message}")
+                    runOnUiThread {
+                        Toast.makeText(this@SpotifySearchActivity, "Error de red al renovar token: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             })
         } else {
-            Toast.makeText(this, "No se encontró el refresh token", Toast.LENGTH_SHORT).show()
+            runOnUiThread {
+                Toast.makeText(this@SpotifySearchActivity, "No se encontró el refresh token", Toast.LENGTH_SHORT).show()
+            }
         }
     }
-
 }
