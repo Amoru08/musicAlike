@@ -6,31 +6,43 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class SongAdapter(private var songs: MutableList<String>) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
+data class Song(
+    val name: String,   // Nombre de la canción
+    val artist: String, // Nombre del artista
+    val url: String     // URL externa de la canción (puede ser el enlace a la canción en Spotify)
+)
+
+
+class SongAdapter(private val songs: MutableList<Song>) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_song, parent, false)
         return SongViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-        holder.bind(songs[position])
+        val song = songs[position]
+        holder.bind(song)
     }
 
     override fun getItemCount(): Int = songs.size
 
-    // Método para actualizar la lista de canciones
-    fun updateResults(newSongs: List<String>) {
+    // Método para actualizar los resultados de la búsqueda
+    fun updateResults(newSongs: List<Song>) {
         songs.clear()
         songs.addAll(newSongs)
         notifyDataSetChanged()
     }
 
     class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val songName: TextView = itemView.findViewById(android.R.id.text1)
+        private val songNameTextView: TextView = itemView.findViewById(R.id.songNameTextView)
+        private val artistNameTextView: TextView = itemView.findViewById(R.id.artistNameTextView)
+        private val songUrlTextView: TextView = itemView.findViewById(R.id.songUrlTextView)
 
-        fun bind(name: String) {
-            songName.text = name
+        fun bind(song: Song) {
+            songNameTextView.text = song.name
+            artistNameTextView.text = song.artist
+            songUrlTextView.text = song.url
         }
     }
 }

@@ -52,7 +52,7 @@ dependencies {
 
     // Spotify Authentication
     implementation("com.spotify.android:auth:1.2.3")
-
+    implementation ("com.google.android.gms:play-services-auth:20.3.0")
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     //implementation ("com.spotify.android:spotify-app-remote:0.7.0")

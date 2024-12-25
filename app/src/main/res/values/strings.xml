@@ -6,4 +6,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navi_open">"Abre el drawer"</string>
     <string name="navi_close">"Cierra el drawer"</string>
+    <!-- Agrega tu google_client_id y google_client_secret aquí -->
+    <string name="google_client_id">737868555414-cmhtom6qlrr5h6q8ru57kncdd5u98nm6.apps.googleusercontent.com</string>
+
 </resources>

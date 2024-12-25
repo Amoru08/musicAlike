@@ -23,7 +23,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var usurSpot: Button
 
     private lateinit var songAdapter: SongAdapter
-    private var songList: MutableList<String> = mutableListOf()
+    private var songList: MutableList<Song> = mutableListOf()
 
     // Configuración de Spotify
     private val SCOPE = "user-read-private user-read-email playlist-read-private user-library-read"
@@ -56,9 +56,6 @@ class HomeActivity : AppCompatActivity() {
         recyclerView.adapter = songAdapter
 
         // Agregar algunas canciones predeterminadas
-        songList.add("Song 1")
-        songList.add("Song 2")
-        songList.add("Song 3")
         songAdapter.notifyDataSetChanged()
 
         // Manejar redirección si la app se inicia desde una URI
