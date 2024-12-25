@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 data class Song(
     val name: String,   // Nombre de la canción
     val artist: String, // Nombre del artista
-    val url: String     // URL externa de la canción (puede ser el enlace a la canción en Spotify)
 )
 
 
@@ -37,12 +36,11 @@ class SongAdapter(private val songs: MutableList<Song>) : RecyclerView.Adapter<S
     class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val songNameTextView: TextView = itemView.findViewById(R.id.songNameTextView)
         private val artistNameTextView: TextView = itemView.findViewById(R.id.artistNameTextView)
-        private val songUrlTextView: TextView = itemView.findViewById(R.id.songUrlTextView)
 
         fun bind(song: Song) {
             songNameTextView.text = song.name
             artistNameTextView.text = song.artist
-            songUrlTextView.text = song.url
         }
     }
 }
+

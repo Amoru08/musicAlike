@@ -19,7 +19,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var buton: Button
     private lateinit var buscarButton: Button
     private lateinit var escribe: TextInputEditText
-    private lateinit var recyclerView: RecyclerView
+    //private lateinit var recyclerView: RecyclerView
     private lateinit var usurSpot: Button
 
     private lateinit var songAdapter: SongAdapter
@@ -46,14 +46,14 @@ class HomeActivity : AppCompatActivity() {
         textview = findViewById(R.id.textView4)
         buton = findViewById(R.id.buttonHome)
         buscarButton = findViewById(R.id.buscar)
-        escribe = findViewById(R.id.agregarCancion)
+        //escribe = findViewById(R.id.agregarCancion)
         usurSpot = findViewById(R.id.usuario)
-        recyclerView = findViewById(R.id.recyclerViewResults)
+        //recyclerView = findViewById(R.id.recyclerViewResults)
 
         // Configuración del RecyclerView
         songAdapter = SongAdapter(songList)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = songAdapter
+        //recyclerView.layoutManager = LinearLayoutManager(this)
+        //recyclerView.adapter = songAdapter
 
         // Agregar algunas canciones predeterminadas
         songAdapter.notifyDataSetChanged()
@@ -73,14 +73,9 @@ class HomeActivity : AppCompatActivity() {
 
         // Configurar el botón buscar para realizar búsqueda
         buscarButton.setOnClickListener {
-            val query = escribe.text.toString()
-            if (query.isNotEmpty()) {
                 val intent = Intent(this, SpotifySearchActivity::class.java)
-                intent.putExtra("QUERY", query) // Pasar la consulta como extra
                 startActivity(intent)
-            } else {
-                Toast.makeText(this, "Por favor, escribe algo para buscar", Toast.LENGTH_SHORT).show()
-            }
+
         }
 
         // Configuración del botón "Atrás"

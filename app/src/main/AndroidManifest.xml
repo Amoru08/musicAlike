@@ -4,6 +4,8 @@
 
 <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 
 
     <application
@@ -29,13 +31,9 @@
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="musicalike" android:host="callback" />
-            </intent-filter>
+            <!-- Elimina el intent-filter si no quieres que HomeActivity se inicie a través de un esquema de URL -->
         </activity>
+
 
         <!-- MainActivity como actividad principal -->
         <activity
