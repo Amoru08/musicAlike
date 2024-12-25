@@ -105,7 +105,7 @@ class SpotifySearchActivity : AppCompatActivity() {
 
     // Construir la URL de búsqueda con el parámetro `maxResults` y `pageToken`
     private fun buildUrl(query: String, pageToken: String?): String {
-        var url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=$query&type=video&videoCategoryId=10&maxResults=50&key=$apiKey"
+        var url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=$query&type=video&videoCategoryId=10&maxResults=20&key=$apiKey"
         pageToken?.let {
             url += "&pageToken=$it"  // Agregar el nextPageToken para paginación
         }
@@ -125,9 +125,19 @@ class SpotifySearchActivity : AppCompatActivity() {
                 val video = itemsArray.getJSONObject(i)
                 val snippet = video.getJSONObject("snippet")
                 val videoTitle = snippet.getString("title")  // Título del video
+                val channelTitle = snippet.getString("channelTitle")  // Nombre del canal
+
+                // Obtener etiquetas (si existen)
+                val tagsArray = snippet.optJSONArray("tags")
+                val tags = mutableListOf<String>()
+                if (tagsArray != null) {
+                    for (j in 0 until tagsArray.length()) {
+                        tags.add(tagsArray.getString(j))
+                    }
+                }
 
                 // Crear un objeto Song y agregarlo a la lista
-                val song = Song(videoTitle, "YouTube")  // Asumiendo "YouTube" como el nombre del artista
+                val song = Song(videoTitle, channelTitle, tags)  // Asumiendo "YouTube" como el nombre del artista y las etiquetas
                 videos.add(song)
             }
         } catch (e: Exception) {
@@ -136,5 +146,6 @@ class SpotifySearchActivity : AppCompatActivity() {
 
         return videos
     }
+
 
 }

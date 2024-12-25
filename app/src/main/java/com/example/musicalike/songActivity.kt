@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 data class Song(
     val name: String,   // Nombre de la canción
     val artist: String, // Nombre del artista
+    val tags: List<String> = listOf()
 )
 
 

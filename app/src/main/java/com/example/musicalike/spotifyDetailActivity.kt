@@ -44,8 +44,9 @@ class SpotifyDetailsActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
+                    // Recupera el nombre y el email del documento
+                    val displayName = document.getString("name") ?: "Sin nombre"
                     val email = document.getString("email") ?: "Sin email"
-                    val displayName = document.getString("displayName") ?: "Sin nombre"
 
                     // Actualiza los TextViews con la información del usuario
                     tvUserName.text = "Nombre: $displayName"

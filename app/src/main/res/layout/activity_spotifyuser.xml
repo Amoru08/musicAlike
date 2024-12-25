@@ -29,18 +29,20 @@
         app:layout_constraintTop_toBottomOf="@id/emailSpotify"/>
 
     <!-- Botón de autenticación -->
-    <Button
-        android:id="@+id/authButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Autenticar"
-        app:layout_constraintTop_toBottomOf="@id/passwSpotify"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
 
     <!-- Botón de detalles -->
 
     <!-- WebView oculto inicialmente, usado para la autenticación de Spotify -->
+    <Button
+        android:id="@+id/authButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Autenticar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwSpotify" />
+
     <Button
         android:id="@+id/detalles"
         android:layout_width="wrap_content"
