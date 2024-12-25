@@ -61,7 +61,13 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("com.google.code.gson:gson:2.6.1")
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
 
+    // Dependencia de logging-interceptor para OkHttp
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    // Dependencia de coroutines (si no la tienes ya)
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     // Firebase Auth
     implementation("com.google.firebase:firebase-auth")
