@@ -30,5 +30,17 @@
             android:textColor="#777777"
             android:text="Nombre del artista"/>
 
+        <!-- Botón de favoritos -->
+        <ImageView
+            android:id="@+id/favoriteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:clickable="true"
+            android:contentDescription="Marcar como favorito"
+            android:focusable="true"
+            android:padding="3dp"
+            android:src="@drawable/star_icon" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

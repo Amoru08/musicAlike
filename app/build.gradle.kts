@@ -48,11 +48,11 @@ dependencies {
     // Firebase BOM y servicios
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    //implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Spotify Authentication
     implementation("com.spotify.android:auth:1.2.3")
-    implementation ("com.google.android.gms:play-services-auth:20.3.0")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     //implementation ("com.spotify.android:spotify-app-remote:0.7.0")

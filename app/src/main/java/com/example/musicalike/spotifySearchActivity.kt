@@ -146,6 +146,4 @@ class SpotifySearchActivity : AppCompatActivity() {
 
         return videos
     }
-
-
 }

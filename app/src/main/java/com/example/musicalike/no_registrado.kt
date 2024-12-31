@@ -16,10 +16,9 @@ enum class ProviderType {
 class no_registrado : AppCompatActivity() {
 
     private lateinit var login: Button
-    private lateinit var regis2: Button
+    private lateinit var regis: Button
     private lateinit var email: EditText
     private lateinit var contra: EditText
-    private lateinit var acceder: Button
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,14 +27,11 @@ class no_registrado : AppCompatActivity() {
 
         email = findViewById(R.id.elEmail)
         contra = findViewById(R.id.contrasena)
-        regis2 = findViewById(R.id.regis2)
+        regis = findViewById(R.id.regis2)
         login = findViewById(R.id.atras)
-        // Configurar listeners para botones
         login.setOnClickListener {
             goToLogin()
         }
-
-        // Llamar a setup para configurar autenticación
         setup()
     }
 
@@ -45,15 +41,12 @@ class no_registrado : AppCompatActivity() {
     }
 
     private fun setup() {
-        title = "Autenticación"
-
-        // Listener para el botón de registro
-        regis2.setOnClickListener {
+        regis.setOnClickListener {
             if (email.text.isNotEmpty() && contra.text.isNotEmpty()) {
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.text.toString(), contra.text.toString())
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
-                            showHome(it.result?.user?.email ?: "", ProviderType.BASIC)
+                            goToHome()
                         } else {
                             showAlert()
                         }
@@ -62,9 +55,6 @@ class no_registrado : AppCompatActivity() {
                 showAlert("Por favor, complete todos los campos.")
             }
         }
-
-        // Listener para el botón de acceso
-
     }
 
     private fun showAlert(message: String = "Se ha producido un error") {
@@ -72,6 +62,8 @@ class no_registrado : AppCompatActivity() {
         builder.setTitle("Error")
         builder.setMessage(message)
         builder.setPositiveButton("Aceptar", null)
+        builder.setNegativeButton("Cancelar") { _, _ -> goToLogin() }
+
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
@@ -82,5 +74,10 @@ class no_registrado : AppCompatActivity() {
             putExtra("provider", provider.name)
         }
         startActivity(homeIntent)
+    }
+    private fun goToHome() {
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

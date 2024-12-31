@@ -114,4 +114,5 @@ class SpotifyUserActivity : AppCompatActivity() {
                 Toast.makeText(this, "Has cerrado sesión exitosamente", Toast.LENGTH_SHORT).show()
             }
     }
+
 }
