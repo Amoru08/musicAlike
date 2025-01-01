@@ -16,8 +16,8 @@ class SpotifyUserActivity : AppCompatActivity() {
 
     private lateinit var detailButton: Button
     private lateinit var loginButton: Button
-    private lateinit var signOutButton: Button  // Botón para cerrar sesión
-    private val requestCode = 9001  // Código de solicitud para la autenticación de Google
+    private lateinit var signOutButton: Button
+    private val requestCode = 9001
 
     private val firestoreDb = FirebaseFirestore.getInstance()
 
@@ -25,38 +25,27 @@ class SpotifyUserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_spotifyuser)
 
-        // Inicializa las vistas
         loginButton = findViewById(R.id.authButton)
         detailButton = findViewById(R.id.detalles)
-        signOutButton = findViewById(R.id.signOutButton) // Agregar botón de cerrar sesión
+        signOutButton = findViewById(R.id.signOutButton)
 
-        // Configura el botón de login
         loginButton.setOnClickListener { authenticateWithGoogle() }
 
-        // Configura el botón de detalles
         detailButton.setOnClickListener { goToDetalles() }
 
-        // Configura el botón de cerrar sesión
         signOutButton.setOnClickListener { signOutFromGoogle() }
     }
 
-    /**
-     * Inicia el flujo de autenticación con Google
-     */
     private fun authenticateWithGoogle() {
         Log.d("SpotifyUserActivity", "Iniciando autenticación con Google")
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
 
         val googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-        // Si el usuario ya ha iniciado sesión, ofrecer la opción de cambiar de cuenta
         if (GoogleSignIn.getLastSignedInAccount(this) != null) {
-            googleSignInClient.signOut()  // Cerrar sesión antes de permitir otro inicio
+            googleSignInClient.signOut()
         }
-
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, requestCode)
     }
@@ -67,12 +56,10 @@ class SpotifyUserActivity : AppCompatActivity() {
         if (requestCode == this.requestCode) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                // El usuario ha iniciado sesión correctamente
                 val account = task.getResult(ApiException::class.java)
                 Log.d("SpotifyUserActivity", "Cuenta de Google: ${account?.displayName}, Email: ${account?.email}")
                 saveUserDetails(account)
             } catch (e: ApiException) {
-                // Error de autenticación
                 Log.e("SpotifyUserActivity", "Error de autenticación: ${e.message}")
                 Toast.makeText(this, "Error de autenticación: ${e.message}", Toast.LENGTH_SHORT).show()
             }
@@ -103,9 +90,6 @@ class SpotifyUserActivity : AppCompatActivity() {
         startActivity(i)
     }
 
-    /**
-     * Cerrar sesión del usuario de Google
-     */
     private fun signOutFromGoogle() {
         val googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
 

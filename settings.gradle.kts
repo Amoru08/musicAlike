@@ -13,12 +13,12 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS) // Ensures no project-level repositories are defined.
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
         flatDir {
-            dirs("app/libs") // Make sure your .aar files are in this directory.
+            dirs("app/libs")
         }
     }
 }
