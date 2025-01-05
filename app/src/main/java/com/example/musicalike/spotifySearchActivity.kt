@@ -25,6 +25,7 @@ class SpotifySearchActivity : AppCompatActivity() {
     private val apiKey = "AIzaSyAUkgeL0z1-owXSORm81ckUZqwqhClOImw"
     private var nextPageToken: String? = null
     private var userEmail: String? = null
+    private val firestoreDb = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,7 +103,7 @@ class SpotifySearchActivity : AppCompatActivity() {
                             if (videos.isEmpty()) {
                                 Toast.makeText(this@SpotifySearchActivity, "No se encontraron resultados", Toast.LENGTH_SHORT).show()
                             } else {
-                                adapter.updateResults(videos)
+                                checkFavorites(videos)
                             }
                         }
                     } else {
@@ -175,6 +176,28 @@ class SpotifySearchActivity : AppCompatActivity() {
 
     private fun cleanArtistName(name: String): String {
         return name.replace("VEVO", "", true).replace("- Topic", "", true).trim()
+    }
+
+    private fun checkFavorites(songs: List<Song>) {
+        val userRef = firestoreDb.collection("users").document(userEmail!!).collection("favoritos")
+
+        userRef.get().addOnSuccessListener { documents ->
+            val favoriteNames = documents.map { it.getString("Nombre") to it.getString("Artista") }.toSet()
+
+            songs.forEach { song ->
+                val parts = song.name.split(" - ")
+                if (parts.size > 1) {
+                    song.artist = parts[0].trim()
+                    song.name = parts[1].trim()
+                }
+
+                if (favoriteNames.contains(song.name to song.artist)) {
+                    song.isFavorite = true
+                }
+            }
+
+            adapter.updateResults(songs)
+        }
     }
 
     private fun onFavoriteClicked(song: Song) {
