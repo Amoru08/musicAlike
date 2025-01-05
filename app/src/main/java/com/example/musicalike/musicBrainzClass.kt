@@ -9,8 +9,9 @@ class MusicBrainzService {
 
     private val client = OkHttpClient()
 
-    fun searchRecordingsByTag(tag: String, callback: (List<Recording>?) -> Unit) {
-        val url = "https://musicbrainz.org/ws/2/recording/?query=tag:${URLEncoder.encode(tag, "UTF-8")}&fmt=json"
+    fun searchTagsBySongAndArtist(songTitle: String, artistName: String, callback: (List<String>?) -> Unit) {
+        val query = "${URLEncoder.encode(songTitle, "UTF-8")} AND artist:${URLEncoder.encode(artistName, "UTF-8")}"
+        val url = "https://musicbrainz.org/ws/2/recording/?query=${query}&fmt=json"
 
         val request = Request.Builder()
             .url(url)
@@ -33,23 +34,18 @@ class MusicBrainzService {
                 responseBody?.let {
                     val json = JSONObject(it)
                     val recordingsArray = json.getJSONArray("recordings")
-                    val recordings = mutableListOf<Recording>()
-                    for (i in 0 until recordingsArray.length()) {
-                        val recordingJson = recordingsArray.getJSONObject(i)
-                        val recording = Recording(
-                            id = recordingJson.getString("id"),
-                            title = recordingJson.getString("title"),
-                            artist = recordingJson.getJSONArray("artist-credit").getJSONObject(0).getJSONObject("artist").getString("name"),
-                            tags = if (recordingJson.has("tags")) {
-                                val tagsArray = recordingJson.getJSONArray("tags")
-                                (0 until tagsArray.length()).map { tagsArray.getJSONObject(it).getString("name") }
-                            } else {
-                                emptyList()
-                            }
-                        )
-                        recordings.add(recording)
+                    if (recordingsArray.length() > 0) {
+                        val recordingJson = recordingsArray.getJSONObject(0)
+                        val tags = if (recordingJson.has("tags")) {
+                            val tagsArray = recordingJson.getJSONArray("tags")
+                            (0 until tagsArray.length()).map { tagsArray.getJSONObject(it).getString("name") }
+                        } else {
+                            emptyList()
+                        }
+                        callback(tags)
+                    } else {
+                        callback(null)
                     }
-                    callback(recordings)
                 } ?: run {
                     callback(null)
                 }
@@ -57,10 +53,3 @@ class MusicBrainzService {
         })
     }
 }
-
-data class Recording(
-    val id: String,
-    val title: String,
-    val artist: String,
-    val tags: List<String>
-)

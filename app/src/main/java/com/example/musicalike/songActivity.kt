@@ -109,7 +109,7 @@ class SongAdapter(
             val parts = song.name.split(" - ")
             if (parts.size > 1) {
                 song.artist = parts[0].trim()
-                song.name = parts[1].trim()
+                song.name = cleanSongName(parts[1].trim())
             }
 
             firestoreDb.collection("users").document(userEmail).collection("favoritos")
@@ -157,6 +157,11 @@ class SongAdapter(
                     // Error al eliminar en Firestore
                     e.printStackTrace()
                 }
+        }
+
+        private fun cleanSongName(name: String): String {
+            return name.replace(Regex("\\s*\\([^)]*\\)\\s*"), "")
+                .replace(Regex("&\\S*"), "").trim()
         }
     }
 }
