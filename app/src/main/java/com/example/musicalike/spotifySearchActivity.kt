@@ -21,7 +21,7 @@ class SpotifySearchActivity : AppCompatActivity() {
     private lateinit var resultsRecyclerView: RecyclerView
     private lateinit var adapter: SongAdapter
     private val client = OkHttpClient()
-    private val musicBrainzService = MusicBrainzService()
+    private val lastFmService = LastFmService() // Asegúrate de usar LastFmService
 
     private val apiKey = "AIzaSyAUkgeL0z1-owXSORm81ckUZqwqhClOImw" // Reemplaza con tu clave de API válida
     private var nextPageToken: String? = null
@@ -32,9 +32,7 @@ class SpotifySearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_spotify_search)
 
-        // Obtener el email del usuario autenticado
         userEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
-
         if (userEmail == null) {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
             finish()
@@ -84,10 +82,7 @@ class SpotifySearchActivity : AppCompatActivity() {
         val encodedQuery = URLEncoder.encode(query, "UTF-8")
         val url = buildUrl(encodedQuery, pageToken)
 
-        val request = Request.Builder()
-            .url(url)
-            .build()
-
+        val request = Request.Builder().url(url).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
@@ -115,7 +110,6 @@ class SpotifySearchActivity : AppCompatActivity() {
                 } else {
                     runOnUiThread {
                         Toast.makeText(this@SpotifySearchActivity, "Error en la búsqueda: ${response.code}", Toast.LENGTH_SHORT).show()
-                        Log.e("YouTubeSearch", "Error en la búsqueda: ${response.body?.string()}")
                     }
                 }
             }
@@ -124,15 +118,12 @@ class SpotifySearchActivity : AppCompatActivity() {
 
     private fun buildUrl(query: String, pageToken: String?): String {
         var url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=$query&type=video&videoCategoryId=10&maxResults=20&key=$apiKey"
-        pageToken?.let {
-            url += "&pageToken=$it"
-        }
+        pageToken?.let { url += "&pageToken=$it" }
         return url
     }
 
     private fun parseYouTubeVideos(responseBody: String?): List<Song> {
         val videos = mutableListOf<Song>()
-
         try {
             val jsonObject = JSONObject(responseBody)
             val itemsArray = jsonObject.getJSONArray("items")
@@ -166,21 +157,22 @@ class SpotifySearchActivity : AppCompatActivity() {
     }
 
     private fun isSong(title: String): Boolean {
-        val lowerCaseTitle = title.toLowerCase()
-        return !lowerCaseTitle.contains("lyrics") && !lowerCaseTitle.contains("karaoke")
-                && !lowerCaseTitle.contains("#Shorts") && !lowerCaseTitle.contains("lyric")
-                && !lowerCaseTitle.contains("live") && !lowerCaseTitle.contains("cover")
-                && !lowerCaseTitle.contains("festival")
+        val lowerCaseTitle = title.lowercase()
+        return !listOf("lyrics", "karaoke", "#shorts", "lyric", "live", "cover", "festival").any {
+            lowerCaseTitle.contains(it)
+        }
     }
 
     private fun cleanArtistName(name: String): String {
-        return name.replace("VEVO", "", true).replace("- Topic", "", true)
+        return name.replace("VEVO", "", true)
+            .replace("- Topic", "", true)
             .split(",")[0]
             .trim()
     }
 
     private fun cleanSongName(name: String): String {
-        return name.replace(Regex("\\s*\\([^)]*\\)\\s*"), "") .replace(Regex("&\\S*"), "").trim()
+        return name.replace(Regex("\\s*\\([^)]*\\)\\s*"), "")
+            .replace(Regex("&\\S*"), "").trim()
     }
 
     private fun checkFavorites(songs: List<Song>) {
@@ -195,6 +187,7 @@ class SpotifySearchActivity : AppCompatActivity() {
                     song.artist = cleanArtistName(parts[0].trim())
                     song.name = cleanSongName(parts[1].trim())
                 }
+                song.isFavorite = favoriteNames.contains(song.name to song.artist)
             }
 
             adapter.updateResults(songs)
@@ -216,33 +209,25 @@ class SpotifySearchActivity : AppCompatActivity() {
             firestoreDb.collection("users").document(email).collection("favoritos")
                 .add(favoriteSong)
                 .addOnSuccessListener {
-                    Log.d("SpotifySearchActivity", "Favorite song saved: $cleanedSongName")
                     Toast.makeText(this, "Canción guardada como favorita", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener { e ->
-                    Log.e("SpotifySearchActivity", "Error al guardar la canción favorita: ${e.message}")
-                    Toast.makeText(this, "Error al guardar la canción favorita: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-
-            musicBrainzService.searchTagsBySongAndArtist(cleanedSongName, song.artist) { tags ->
-                if (tags != null && tags.isNotEmpty()) {
-                    val topTags = tags.take(10)
-                    firestoreDb.collection("users").document(email).collection("favoritos")
-                        .whereEqualTo("Nombre", cleanedSongName)
-                        .whereEqualTo("Artista", song.artist)
-                        .get()
-                        .addOnSuccessListener { documents ->
-                            for (document in documents) {
-                                firestoreDb.collection("users").document(email).collection("favoritos")
-                                    .document(document.id)
-                                    .update("Tags", topTags)
-                            }
+                    lastFmService.searchTagsBySongAndArtist(cleanedSongName, song.artist) { tags ->
+                        Log.d("SpotifySearchActivity", "Tags from Last.fm: $tags")  // Log para verificar los tags
+                        if (!tags.isNullOrEmpty()) {
+                            val topTags = tags.take(10)
+                            firestoreDb.collection("users").document(email).collection("favoritos")
+                                .whereEqualTo("Nombre", cleanedSongName)
+                                .whereEqualTo("Artista", song.artist)
+                                .get()
+                                .addOnSuccessListener { documents ->
+                                    for (document in documents) {
+                                        firestoreDb.collection("users").document(email).collection("favoritos")
+                                            .document(document.id)
+                                            .update("Tags", topTags)
+                                    }
+                                }
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("SpotifySearchActivity", "Error al actualizar los tags: ${e.message}")
-                        }
+                    }
                 }
-            }
         }
     }
 }

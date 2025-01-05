@@ -1,21 +1,25 @@
 package com.example.musicalike
 
+import android.util.Log
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 import java.net.URLEncoder
 
-class MusicBrainzService {
+class LastFmService {
 
     private val client = OkHttpClient()
+    private val apiKey = "ef00b8f621f08d051b3e443f5acbc424" // Reemplaza con tu API Key de Last.fm
 
     fun searchTagsBySongAndArtist(songTitle: String, artistName: String, callback: (List<String>?) -> Unit) {
-        val query = "${URLEncoder.encode(songTitle, "UTF-8")} AND artist:${URLEncoder.encode(artistName, "UTF-8")}"
-        val url = "https://musicbrainz.org/ws/2/recording/?query=${query}&fmt=json"
+        val url = "http://ws.audioscrobbler.com/2.0/?method=track.gettoptags" +
+                "&track=${URLEncoder.encode(songTitle, "UTF-8")}" +
+                "&artist=${URLEncoder.encode(artistName, "UTF-8")}" +
+                "&api_key=$apiKey&format=json"
 
         val request = Request.Builder()
             .url(url)
-            .addHeader("User-Agent", "YourAppName/1.0 (your-email@example.com)")
+            .addHeader("User-Agent", "MusicAlike/1.0 (musicalikesoporte@gmail.com)")
             .build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -32,18 +36,22 @@ class MusicBrainzService {
 
                 val responseBody = response.body?.string()
                 responseBody?.let {
-                    val json = JSONObject(it)
-                    val recordingsArray = json.getJSONArray("recordings")
-                    if (recordingsArray.length() > 0) {
-                        val recordingJson = recordingsArray.getJSONObject(0)
-                        val tags = if (recordingJson.has("tags")) {
-                            val tagsArray = recordingJson.getJSONArray("tags")
-                            (0 until tagsArray.length()).map { tagsArray.getJSONObject(it).getString("name") }
+                    try {
+                        val json = JSONObject(it)
+                        val tagsObject = json.getJSONObject("toptags")
+                        val tagsArray = tagsObject.optJSONArray("tag")
+
+                        if (tagsArray != null && tagsArray.length() > 0) {
+                            val tags = (0 until tagsArray.length())
+                                .map { tagsArray.getJSONObject(it).getString("name") }
+                            Log.d("LastFmService", "Tags: $tags")
+                            callback(tags)
                         } else {
-                            emptyList()
+                            Log.d("LastFmService", "No tags found")
+                            callback(emptyList())
                         }
-                        callback(tags)
-                    } else {
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                         callback(null)
                     }
                 } ?: run {
