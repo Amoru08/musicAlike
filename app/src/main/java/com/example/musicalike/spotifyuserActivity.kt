@@ -70,17 +70,19 @@ class SpotifyUserActivity : AppCompatActivity() {
         account?.let {
             val userName = it.displayName ?: "Desconocido"
             val userEmail = it.email ?: "Desconocido"
+            val userDocument = firestoreDb.collection("users").document(userEmail)
 
             Log.d("SpotifyUserActivity", "Usuario: $userName, Email: $userEmail")
 
-            firestoreDb.collection("users")
-                .document(userEmail)
-                .set(mapOf("name" to userName, "email" to userEmail))
+            userDocument.set(mapOf("name" to userName, "email" to userEmail))
                 .addOnSuccessListener {
-                    Log.d("SpotifyUserActivity", "Detalles de usuario guardados en Firestore")
+                    // Documento del usuario creado/actualizado exitosamente
+                    Log.d("SpotifyUserActivity", "Documento del usuario creado/actualizado exitosamente.")
                 }
                 .addOnFailureListener { e ->
-                    Log.e("SpotifyUserActivity", "Error al guardar los detalles del usuario: ${e.message}")
+                    // Manejar el error al crear/actualizar el documento del usuario
+                    e.printStackTrace()
+                    Log.e("SpotifyUserActivity", "Error al crear/actualizar el documento del usuario: ${e.message}")
                 }
         }
     }
