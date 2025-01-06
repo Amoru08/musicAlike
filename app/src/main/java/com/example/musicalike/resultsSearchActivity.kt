@@ -31,9 +31,12 @@ class ResultsSearchActivity : AppCompatActivity() {
             return
         }
 
-        adapter = SongAdapter(mutableListOf(), userEmail!!) { song ->
-            onFavoriteClicked(song)
-        }
+        adapter = SongAdapter(
+            songs = mutableListOf(),
+            userEmail = userEmail!!,
+            onFavoriteClicked = { song -> onFavoriteClicked(song) },
+            onSongClicked = { song -> onSongClicked(song) } // Callback adicional
+        )
 
         songRecyclerView.layoutManager = LinearLayoutManager(this)
         songRecyclerView.adapter = adapter
@@ -68,5 +71,11 @@ class ResultsSearchActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error al guardar la canción favorita: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
+    }
+
+    private fun onSongClicked(song: Song) {
+        // Aquí puedes implementar la lógica para manejar el clic en la canción
+        Log.d("ResultsSearchActivity", "Song clicked: ${song.name}")
+        Toast.makeText(this, "Has seleccionado: ${song.name} de ${song.artist}", Toast.LENGTH_SHORT).show()
     }
 }

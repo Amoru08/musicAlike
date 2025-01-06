@@ -20,11 +20,7 @@ class SpotifySearchActivity : AppCompatActivity() {
     private lateinit var searchField: TextInputEditText
     private lateinit var resultsRecyclerView: RecyclerView
     private lateinit var adapter: SongAdapter
-    private val client = OkHttpClient()
-    private val lastFmService = LastFmService() // Asegúrate de usar LastFmService
-
-    private val apiKey = "AIzaSyAUkgeL0z1-owXSORm81ckUZqwqhClOImw" // Reemplaza con tu clave de API válida
-    private var nextPageToken: String? = null
+    private val spotifyService = SpotifyService("d95be9b432a2437c913e965dcd72487d", "73b6598e631e4e51834db25238b82b32") // Reemplaza con tus credenciales
     private var userEmail: String? = null
     private val firestoreDb = FirebaseFirestore.getInstance()
 
@@ -41,9 +37,12 @@ class SpotifySearchActivity : AppCompatActivity() {
 
         searchField = findViewById(R.id.agregarCancion)
         resultsRecyclerView = findViewById(R.id.resultsRecyclerView)
-        adapter = SongAdapter(mutableListOf(), userEmail!!) { song ->
-            onFavoriteClicked(song)
-        }
+        adapter = SongAdapter(
+            mutableListOf(),
+            userEmail!!,
+            onFavoriteClicked = { song -> onFavoriteClicked(song) },
+            onSongClicked = { song -> onSongClicked(song) } // Pasar el callback para el click en la canción
+        )
         resultsRecyclerView.layoutManager = LinearLayoutManager(this)
         resultsRecyclerView.adapter = adapter
 
@@ -51,31 +50,11 @@ class SpotifySearchActivity : AppCompatActivity() {
         searchButton.setOnClickListener {
             val query = searchField.text.toString()
             if (query.isNotEmpty()) {
-                nextPageToken = null
                 searchYouTube(query)
             } else {
                 Toast.makeText(this, "Por favor, ingresa una canción o artista", Toast.LENGTH_SHORT).show()
             }
         }
-
-        resultsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val visibleItemCount = layoutManager.childCount
-                val totalItemCount = layoutManager.itemCount
-                val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
-
-                if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                    val query = searchField.text.toString()
-                    if (query.isNotEmpty()) {
-                        nextPageToken?.let {
-                            searchYouTube(query, it)
-                        }
-                    }
-                }
-            }
-        })
     }
 
     private fun searchYouTube(query: String, pageToken: String? = null) {
@@ -83,7 +62,7 @@ class SpotifySearchActivity : AppCompatActivity() {
         val url = buildUrl(encodedQuery, pageToken)
 
         val request = Request.Builder().url(url).build()
-        client.newCall(request).enqueue(object : Callback {
+        OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
                     Toast.makeText(this@SpotifySearchActivity, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -117,7 +96,7 @@ class SpotifySearchActivity : AppCompatActivity() {
     }
 
     private fun buildUrl(query: String, pageToken: String?): String {
-        var url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=$query&type=video&videoCategoryId=10&maxResults=20&key=$apiKey"
+        var url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=$query&type=video&videoCategoryId=10&maxResults=20&key=AIzaSyAUkgeL0z1-owXSORm81ckUZqwqhClOImw"
         pageToken?.let { url += "&pageToken=$it" }
         return url
     }
@@ -127,8 +106,6 @@ class SpotifySearchActivity : AppCompatActivity() {
         try {
             val jsonObject = JSONObject(responseBody)
             val itemsArray = jsonObject.getJSONArray("items")
-            nextPageToken = jsonObject.optString("nextPageToken")
-
             for (i in 0 until itemsArray.length()) {
                 val video = itemsArray.getJSONObject(i)
                 val snippet = video.getJSONObject("snippet")
@@ -158,7 +135,7 @@ class SpotifySearchActivity : AppCompatActivity() {
 
     private fun isSong(title: String): Boolean {
         val lowerCaseTitle = title.lowercase()
-        return !listOf("lyrics", "karaoke", "#shorts", "lyric", "live", "cover", "festival").any {
+        return !listOf("lyrics", "karaoke", "#shorts", "lyric", "live", "cover", "festival", "sub").any {
             lowerCaseTitle.contains(it)
         }
     }
@@ -197,37 +174,41 @@ class SpotifySearchActivity : AppCompatActivity() {
     private fun onFavoriteClicked(song: Song) {
         userEmail?.let { email ->
             Log.d("SpotifySearchActivity", "Favorite clicked for song: ${song.name}")
-            val limitedTags = song.tags.take(10)
             val cleanedSongName = cleanSongName(song.name)
 
-            val favoriteSong = mapOf(
-                "Nombre" to cleanedSongName,
-                "Artista" to song.artist,
-                "Tags" to limitedTags
-            )
+            spotifyService.getArtistGenres(song.artist) { genres ->
+                Log.d("SpotifySearchActivity", "Genres from Spotify: $genres")
+                if (genres != null) {
+                    val favoriteSong = mapOf(
+                        "Nombre" to cleanedSongName,
+                        "Artista" to song.artist,
+                        "Tags" to genres
+                    )
 
-            firestoreDb.collection("users").document(email).collection("favoritos")
-                .add(favoriteSong)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Canción guardada como favorita", Toast.LENGTH_SHORT).show()
-                    lastFmService.searchTagsBySongAndArtist(cleanedSongName, song.artist) { tags ->
-                        Log.d("SpotifySearchActivity", "Tags from Last.fm: $tags")  // Log para verificar los tags
-                        if (!tags.isNullOrEmpty()) {
-                            val topTags = tags.take(10)
-                            firestoreDb.collection("users").document(email).collection("favoritos")
-                                .whereEqualTo("Nombre", cleanedSongName)
-                                .whereEqualTo("Artista", song.artist)
-                                .get()
-                                .addOnSuccessListener { documents ->
-                                    for (document in documents) {
-                                        firestoreDb.collection("users").document(email).collection("favoritos")
-                                            .document(document.id)
-                                            .update("Tags", topTags)
-                                    }
-                                }
+                    firestoreDb.collection("users").document(email).collection("favoritos")
+                        .add(favoriteSong)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Canción guardada como favorita", Toast.LENGTH_SHORT).show()
                         }
-                    }
+                        .addOnFailureListener { e ->
+                            Log.e("SpotifySearchActivity", "Error al guardar la canción favorita: ${e.message}")
+                            Toast.makeText(this, "Error al guardar la canción favorita: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
                 }
+            }
+        }
+    }
+
+    private fun onSongClicked(song: Song) {
+        Log.d("SpotifySearchActivity", "Song clicked: ${song.name}")
+        spotifyService.searchSongsByTags(song.tags) { relatedSongs ->
+            runOnUiThread {
+                if (relatedSongs != null) {
+                    adapter.updateResults(relatedSongs)
+                } else {
+                    Toast.makeText(this, "No se encontraron canciones relacionadas", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 }

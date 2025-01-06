@@ -47,11 +47,10 @@ data class Song(
 
 class SongAdapter(
     private val songs: MutableList<Song>,
-    private val userEmail: String, // Asegúrate de pasar userEmail al adaptador
-    private val onFavoriteClicked: (Song) -> Unit // Cambiar el tipo de lambda a (Song) -> Unit
+    private val userEmail: String,
+    private val onFavoriteClicked: (Song) -> Unit,
+    private val onSongClicked: (Song) -> Unit // Callback para el click en la canción
 ) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
-
-    private val firestoreDb = FirebaseFirestore.getInstance()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_song, parent, false)
@@ -60,12 +59,11 @@ class SongAdapter(
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         val song = songs[position]
-        holder.bind(song)
+        holder.bind(song, onFavoriteClicked, onSongClicked)
     }
 
     override fun getItemCount(): Int = songs.size
 
-    // Método para actualizar los resultados de la búsqueda
     fun updateResults(newSongs: List<Song>) {
         songs.clear()
         songs.addAll(newSongs)
@@ -77,91 +75,28 @@ class SongAdapter(
         private val artistNameTextView: TextView = itemView.findViewById(R.id.artistNameTextView)
         private val favoriteButton: ImageView = itemView.findViewById(R.id.favoriteButton)
 
-        fun bind(song: Song) {
+        fun bind(song: Song, onFavoriteClicked: (Song) -> Unit, onSongClicked: (Song) -> Unit) {
             songNameTextView.text = song.name
             artistNameTextView.text = song.artist
 
-            // Establecer el icono basado en si la canción es favorita o no
+            // Cambiar el ícono del botón de favorito según el estado de la canción
             favoriteButton.setImageResource(
                 if (song.isFavorite) R.drawable.star_point_icon else R.drawable.star_icon
             )
 
             favoriteButton.setOnClickListener {
+                // Alternar el estado de favorito
                 song.isFavorite = !song.isFavorite
-                updateFavoriteStatus(song)
                 favoriteButton.setImageResource(
                     if (song.isFavorite) R.drawable.star_point_icon else R.drawable.star_icon
                 )
-                onFavoriteClicked(song) // Llamar a la lambda pasada al adaptador
-            }
-        }
-
-        private fun updateFavoriteStatus(song: Song) {
-            if (song.isFavorite) {
-                addToFavorites(song)
-            } else {
-                removeFromFavorites(song)
-            }
-        }
-
-        private fun addToFavorites(song: Song) {
-            // Separar el nombre y asignar la parte antes del guion como artista
-            val parts = song.name.split(" - ")
-            if (parts.size > 1) {
-                song.artist = parts[0].trim()
-                song.name = cleanSongName(parts[1].trim())
+                onFavoriteClicked(song)
             }
 
-            firestoreDb.collection("users").document(userEmail).collection("favoritos")
-                .whereEqualTo("Nombre", song.name)
-                .whereEqualTo("Artista", song.artist)
-                .get()
-                .addOnSuccessListener { documents ->
-                    if (documents.isEmpty) {
-                        val favoriteSong = hashMapOf(
-                            "Plataforma" to "YouTube",
-                            "Nombre" to song.name,
-                            "Artista" to song.artist
-                        )
-
-                        firestoreDb.collection("users").document(userEmail).collection("favoritos")
-                            .add(favoriteSong)
-                            .addOnSuccessListener {
-                                // Éxito al guardar en Firestore
-                            }
-                            .addOnFailureListener { e ->
-                                // Error al guardar en Firestore
-                                e.printStackTrace()
-                            }
-                    } else {
-                        // Ya existe en los favoritos
-                    }
-                }
-                .addOnFailureListener { e ->
-                    // Error al verificar en Firestore
-                    e.printStackTrace()
-                }
-        }
-
-        private fun removeFromFavorites(song: Song) {
-            firestoreDb.collection("users").document(userEmail).collection("favoritos")
-                .whereEqualTo("Nombre", song.name)
-                .whereEqualTo("Artista", song.artist)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        firestoreDb.collection("users").document(userEmail).collection("favoritos").document(document.id).delete()
-                    }
-                }
-                .addOnFailureListener { e ->
-                    // Error al eliminar en Firestore
-                    e.printStackTrace()
-                }
-        }
-
-        private fun cleanSongName(name: String): String {
-            return name.replace(Regex("\\s*\\([^)]*\\)\\s*"), "")
-                .replace(Regex("&\\S*"), "").trim()
+            itemView.setOnClickListener {
+                // Llamar al callback cuando se hace click en la canción
+                onSongClicked(song)
+            }
         }
     }
 }
