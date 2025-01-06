@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SongListActivity">
+    tools:context=".ResultsSearchActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/songRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
-        tools:listitem="@layout/item_song_card" />
+        tools:listitem="@layout/activity_song" />
 
 </LinearLayout>

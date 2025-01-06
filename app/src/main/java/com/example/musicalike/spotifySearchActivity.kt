@@ -1,5 +1,6 @@
 package com.example.musicalike
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -200,14 +201,45 @@ class SpotifySearchActivity : AppCompatActivity() {
     }
 
     private fun onSongClicked(song: Song) {
-        Log.d("SpotifySearchActivity", "Song clicked: ${song.name}")
-        spotifyService.searchSongsByTags(song.tags) { relatedSongs ->
-            runOnUiThread {
-                if (relatedSongs != null) {
-                    adapter.updateResults(relatedSongs)
+        Log.d("SpotifySearchActivity", "Song clicked: ${song.name} by ${song.artist}")
+        // Obtener los tags de Firestore
+        getSongTagsFromFirestore(song)
+    }
+
+    private fun getSongTagsFromFirestore(song: Song) {
+        firestoreDb.collection("users").document(userEmail!!).collection("favoritos")
+            .whereEqualTo("Nombre", song.name)
+            .whereEqualTo("Artista", song.artist)
+            .get()
+            .addOnSuccessListener { documents ->
+                val tags = documents.flatMap { it.get("Tags") as? List<String> ?: emptyList() }
+                if (tags.isNotEmpty()) {
+                    Log.d("SpotifySearchActivity", "Tags found: $tags")
+                    searchSongsByTags(tags)
                 } else {
-                    Toast.makeText(this, "No se encontraron canciones relacionadas", Toast.LENGTH_SHORT).show()
+                    Log.d("SpotifySearchActivity", "No tags available for search.")
                 }
+            }
+            .addOnFailureListener { e ->
+                Log.e("SpotifySearchActivity", "Error getting tags: ${e.message}")
+            }
+    }
+    private fun searchSongsByTags(tags: List<String>) {
+        if (tags.isEmpty()) {
+            Log.d("SpotifySearchActivity", "No tags available for search.")
+            return
+        }
+
+        // Limitar los tags a los primeros 10
+        val limitedTags = tags.take(10)
+        spotifyService.searchSongsByTags(limitedTags) { songs ->
+            if (songs != null) {
+                // Log the first 10 songs found
+                songs.take(10).forEach { song ->
+                    Log.d("SpotifySearchActivity", "Found song: ${song.name} by ${song.artist}")
+                }
+            } else {
+                Log.d("SpotifySearchActivity", "No songs found with the given tags.")
             }
         }
     }

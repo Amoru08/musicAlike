@@ -15,6 +15,7 @@ class ResultsSearchActivity : AppCompatActivity() {
     private lateinit var adapter: SongAdapter
     private val firestoreDb = FirebaseFirestore.getInstance()
     private var userEmail: String? = null
+    private lateinit var selectedSong: Song
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,11 +42,11 @@ class ResultsSearchActivity : AppCompatActivity() {
         songRecyclerView.layoutManager = LinearLayoutManager(this)
         songRecyclerView.adapter = adapter
 
-        // Obtener los resultados de la búsqueda pasados a través del Intent
-        val videos = intent.getParcelableArrayListExtra<Song>("videos")
-        if (videos != null) {
-            adapter.updateResults(videos)
-        }
+        // Obtener la canción seleccionada pasada a través del Intent
+        selectedSong = intent.getParcelableExtra("selectedSong") ?: return
+
+        // Buscar canciones similares
+        findSongsWithSimilarTags(selectedSong)
     }
 
     private fun onFavoriteClicked(song: Song) {
@@ -77,5 +78,33 @@ class ResultsSearchActivity : AppCompatActivity() {
         // Aquí puedes implementar la lógica para manejar el clic en la canción
         Log.d("ResultsSearchActivity", "Song clicked: ${song.name}")
         Toast.makeText(this, "Has seleccionado: ${song.name} de ${song.artist}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun findSongsWithSimilarTags(song: Song) {
+        // Obtener todas las canciones favoritas del usuario
+        firestoreDb.collection("users").document(userEmail!!).collection("favoritos")
+            .get()
+            .addOnSuccessListener { documents ->
+                val favoriteSongs = documents.map { doc ->
+                    Song(
+                        name = doc.getString("Nombre") ?: "",
+                        artist = doc.getString("Artista") ?: "",
+                        tags = doc.get("Tags") as? List<String> ?: emptyList(),
+                        isFavorite = true
+                    )
+                }
+
+                // Filtrar canciones que tienen al menos un tag igual y no son del mismo artista
+                val similarSongs = favoriteSongs.filter { otherSong ->
+                    otherSong.artist != song.artist && otherSong.tags.intersect(song.tags).isNotEmpty()
+                }
+
+                // Mostrar resultados
+                adapter.updateResults(similarSongs)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ResultsSearchActivity", "Error al buscar canciones similares: ${e.message}")
+                Toast.makeText(this, "Error al buscar canciones similares: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 }
