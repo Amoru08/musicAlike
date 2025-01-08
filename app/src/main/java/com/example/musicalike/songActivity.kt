@@ -47,7 +47,8 @@ data class Song(
             return arrayOfNulls(size)
         }
     }
-}class SongAdapter(
+}
+class SongAdapter(
     private var songs: List<Song>,
     private val userEmail: String,
     private val onFavoriteClicked: (Song) -> Unit,
@@ -86,7 +87,7 @@ data class Song(
 
     fun updateResults(newSongs: List<Song>) {
         songs = newSongs
-        notifyDataSetChanged()
+        notifyDataSetChanged()  // Notifica al RecyclerView que los datos han cambiado
     }
     fun getSongs(): List<Song> {
         return songs

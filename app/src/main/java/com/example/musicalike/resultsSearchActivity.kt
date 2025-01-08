@@ -108,7 +108,7 @@ class ResultsSearchActivity : AppCompatActivity() {
         }
 
         // Limitar los tags a los primeros 10
-        m
+        val limitedTags = tags.take(10)
 
         // Definir las palabras clave a excluir
         val excludeKeywords = listOf("lyrics", "karaoke", "#shorts", "lyric", "live", "cover", "festival", "sub")
