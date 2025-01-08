@@ -52,24 +52,21 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
         })
     }
 
-    // Método para buscar canciones por tags
-    fun searchSongsByTags(tags: List<String>, callback: (List<Song>?) -> Unit) {
+    // Método para buscar una canción y obtener su ID
+    fun searchSong(query: String, callback: (String?) -> Unit) {
         getAccessToken { accessToken ->
             if (accessToken == null) {
                 callback(null)
                 return@getAccessToken
             }
 
-            // Construir la consulta de búsqueda
-            val query = tags.joinToString(" ") { tag -> "tag:$tag" }
-            val searchUrl = "https://api.spotify.com/v1/search?q=$query&type=track"
-
-            val searchRequest = Request.Builder()
+            val searchUrl = "https://api.spotify.com/v1/search?q=$query&type=track&limit=1"
+            val request = Request.Builder()
                 .url(searchUrl)
                 .addHeader("Authorization", "Bearer $accessToken")
                 .build()
 
-            client.newCall(searchRequest).enqueue(object : Callback {
+            client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     e.printStackTrace()
                     callback(null)
@@ -85,18 +82,12 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
                     responseBody?.let {
                         val json = JSONObject(it)
                         val tracks = json.getJSONObject("tracks").getJSONArray("items")
-                        val songs = mutableListOf<Song>()
-
-                        for (i in 0 until tracks.length()) {
-                            val track = tracks.getJSONObject(i)
-                            val name = track.getString("name")
-                            val artist = track.getJSONArray("artists").getJSONObject(0).getString("name")
-                            val songTags = tags // Assuming the tags we searched with are relevant
-
-                            songs.add(Song(name, artist, songTags))
+                        if (tracks.length() > 0) {
+                            val trackId = tracks.getJSONObject(0).getString("id")
+                            callback(trackId)
+                        } else {
+                            callback(null)
                         }
-
-                        callback(songs)
                     } ?: run {
                         callback(null)
                     }
@@ -105,7 +96,45 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
         }
     }
 
-    // Nuevo método para obtener los géneros de un artista
+    // Método para obtener las características de una canción
+    fun getSongFeatures(trackId: String, callback: (JSONObject?) -> Unit) {
+        getAccessToken { accessToken ->
+            if (accessToken == null) {
+                callback(null)
+                return@getAccessToken
+            }
+
+            val url = "https://api.spotify.com/v1/audio-features/$trackId"
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $accessToken")
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    callback(null)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (!response.isSuccessful) {
+                        callback(null)
+                        return
+                    }
+
+                    val responseBody = response.body?.string()
+                    responseBody?.let {
+                        val json = JSONObject(it)
+                        callback(json)
+                    } ?: run {
+                        callback(null)
+                    }
+                }
+            })
+        }
+    }
+
+    // Método para obtener los géneros de un artista
     fun getArtistGenres(artistName: String, callback: (List<String>?) -> Unit) {
         getAccessToken { accessToken ->
             if (accessToken == null) {
@@ -113,14 +142,13 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
                 return@getAccessToken
             }
 
-            // Primero, buscar el ID del artista por su nombre
             val searchUrl = "https://api.spotify.com/v1/search?q=$artistName&type=artist"
-            val searchRequest = Request.Builder()
+            val request = Request.Builder()
                 .url(searchUrl)
                 .addHeader("Authorization", "Bearer $accessToken")
                 .build()
 
-            client.newCall(searchRequest).enqueue(object : Callback {
+            client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     e.printStackTrace()
                     callback(null)
@@ -137,9 +165,7 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
                         val json = JSONObject(it)
                         val artists = json.getJSONObject("artists").getJSONArray("items")
                         if (artists.length() > 0) {
-                            // Obtener el ID del primer artista encontrado
                             val artistId = artists.getJSONObject(0).getString("id")
-                            // Obtener los géneros del artista usando su ID
                             getGenresByArtistId(artistId, callback)
                         } else {
                             callback(null)
@@ -187,5 +213,108 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
                 }
             }
         })
+    }
+
+    // Método para buscar canciones por tags
+    fun searchSongsByTags(tags: List<String>, callback: (List<Song>?) -> Unit) {
+        getAccessToken { accessToken ->
+            if (accessToken == null) {
+                callback(null)
+                return@getAccessToken
+            }
+
+            val tagsJoined = tags.joinToString(" ")
+            val searchUrl = "https://api.spotify.com/v1/search?q=$tagsJoined&type=track&limit=20"
+            val request = Request.Builder()
+                .url(searchUrl)
+                .addHeader("Authorization", "Bearer $accessToken")
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    callback(null)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (!response.isSuccessful) {
+                        callback(null)
+                        return
+                    }
+
+                    val responseBody = response.body?.string()
+                    responseBody?.let {
+                        val json = JSONObject(it)
+                        val tracks = json.getJSONObject("tracks").getJSONArray("items")
+                        val songs = mutableListOf<Song>()
+
+                        for (i in 0 until tracks.length()) {
+                            val track = tracks.getJSONObject(i)
+                            val song = Song(
+                                name = track.getString("name").replace(Regex("\\s*\\([^)]*\\)\\s*"), "").trim(), // Limpiar el nombre de la canción
+                                artist = track.getJSONArray("artists").getJSONObject(0).getString("name"),
+                                tags = listOf() // Assuming tags are not directly available from the API
+                            )
+                            songs.add(song)
+                        }
+
+                        callback(songs)
+                    } ?: run {
+                        callback(null)
+                    }
+                }
+            })
+        }
+    }
+
+    // Método para buscar canciones por artista
+    fun searchSongsByArtist(artist: String, callback: (List<Song>?) -> Unit) {
+        getAccessToken { accessToken ->
+            if (accessToken == null) {
+                callback(null)
+                return@getAccessToken
+            }
+
+            val searchUrl = "https://api.spotify.com/v1/search?q=artist:$artist&type=track&limit=20"
+            val request = Request.Builder()
+                .url(searchUrl)
+                .addHeader("Authorization", "Bearer $accessToken")
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    callback(null)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (!response.isSuccessful) {
+                        callback(null)
+                        return
+                    }
+
+                    val responseBody = response.body?.string()
+                    responseBody?.let {
+                        val json = JSONObject(it)
+                        val tracks = json.getJSONObject("tracks").getJSONArray("items")
+                        val songs = mutableListOf<Song>()
+
+                        for (i in 0 until tracks.length()) {
+                            val track = tracks.getJSONObject(i)
+                            val song = Song(
+                                name = track.getString("name").replace(Regex("\\s*\\([^)]*\\)\\s*"), "").trim(), // Limpiar el nombre de la canción
+                                artist = track.getJSONArray("artists").getJSONObject(0).getString("name"),
+                                tags = listOf() // Assuming tags are not directly available from the API
+                            )
+                            songs.add(song)
+                        }
+
+                        callback(songs)
+                    } ?: run {
+                        callback(null)
+                    }
+                }
+            })
+        }
     }
 }

@@ -9,13 +9,14 @@
     <!-- EditText para el correo electrónico de Spotify -->
     <EditText
         android:id="@+id/emailSpotify"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="412dp"
+        android:layout_height="41dp"
+        android:fontFamily="@font/circular_std_2"
         android:hint="Email"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- EditText para la contraseña de Spotify -->
     <EditText
@@ -23,21 +24,18 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Contraseña"
+        android:fontFamily="@font/circular_std_2"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailSpotify"/>
 
-    <!-- Botón de autenticación -->
-
-    <!-- Botón de detalles -->
-
-    <!-- WebView oculto inicialmente, usado para la autenticación de Spotify -->
     <Button
         android:id="@+id/authButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_width="223dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/circular_std_2"
         android:text="Autenticar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,26 +45,42 @@
         android:id="@+id/detalles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/circular_std_2"
         android:text="Detalles"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.948"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.572"
+        app:layout_constraintVertical_bias="0.275"
         tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/signOutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Cerrar sesion"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.941"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/circular_std_2"
         android:text="Salir"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.135"
+        app:layout_constraintHorizontal_bias="0.049"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.572"
+        app:layout_constraintVertical_bias="0.499"
         tools:ignore="MissingConstraints" />
 
     <WebView

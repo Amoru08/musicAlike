@@ -16,6 +16,7 @@ class ResultsSearchActivity : AppCompatActivity() {
     private val firestoreDb = FirebaseFirestore.getInstance()
     private var userEmail: String? = null
     private lateinit var selectedSong: Song
+    private val spotifyService = SpotifyService("d95be9b432a2437c913e965dcd72487d", "73b6598e631e4e51834db25238b82b32") // Reemplaza con tus credenciales
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,7 @@ class ResultsSearchActivity : AppCompatActivity() {
             songs = mutableListOf(),
             userEmail = userEmail!!,
             onFavoriteClicked = { song -> onFavoriteClicked(song) },
-            onSongClicked = { song -> onSongClicked(song) } // Callback adicional
+            onSongClicked = { song -> onSongClicked(song) }
         )
 
         songRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -45,8 +46,8 @@ class ResultsSearchActivity : AppCompatActivity() {
         // Obtener la canción seleccionada pasada a través del Intent
         selectedSong = intent.getParcelableExtra("selectedSong") ?: return
 
-        // Buscar canciones similares
-        findSongsWithSimilarTags(selectedSong)
+        // Obtener los tags de Firestore y buscar canciones similares
+        getTagsFromFirestoreAndSearchSongs(selectedSong)
     }
 
     private fun onFavoriteClicked(song: Song) {
@@ -80,31 +81,73 @@ class ResultsSearchActivity : AppCompatActivity() {
         Toast.makeText(this, "Has seleccionado: ${song.name} de ${song.artist}", Toast.LENGTH_SHORT).show()
     }
 
-    private fun findSongsWithSimilarTags(song: Song) {
-        // Obtener todas las canciones favoritas del usuario
+    private fun getTagsFromFirestoreAndSearchSongs(song: Song) {
         firestoreDb.collection("users").document(userEmail!!).collection("favoritos")
+            .whereEqualTo("Nombre", song.name)
+            .whereEqualTo("Artista", song.artist)
             .get()
             .addOnSuccessListener { documents ->
-                val favoriteSongs = documents.map { doc ->
-                    Song(
-                        name = doc.getString("Nombre") ?: "",
-                        artist = doc.getString("Artista") ?: "",
-                        tags = doc.get("Tags") as? List<String> ?: emptyList(),
-                        isFavorite = true
-                    )
+                val tags = documents.flatMap { it.get("Tags") as? List<String> ?: emptyList() }
+                if (tags.isNotEmpty()) {
+                    Log.d("ResultsSearchActivity", "Tags found: $tags")
+                    searchSongsByTagsAndArtist(tags, song.artist)
+                } else {
+                    Log.d("ResultsSearchActivity", "No tags available for search.")
                 }
-
-                // Filtrar canciones que tienen al menos un tag igual y no son del mismo artista
-                val similarSongs = favoriteSongs.filter { otherSong ->
-                    otherSong.artist != song.artist && otherSong.tags.intersect(song.tags).isNotEmpty()
-                }
-
-                // Mostrar resultados
-                adapter.updateResults(similarSongs)
             }
             .addOnFailureListener { e ->
-                Log.e("ResultsSearchActivity", "Error al buscar canciones similares: ${e.message}")
-                Toast.makeText(this, "Error al buscar canciones similares: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("ResultsSearchActivity", "Error getting tags: ${e.message}")
+                Toast.makeText(this, "Error obteniendo los tags: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun searchSongsByTagsAndArtist(tags: List<String>, artist: String) {
+        if (tags.isEmpty()) {
+            Log.d("ResultsSearchActivity", "No tags available for search.")
+            return
+        }
+
+        // Limitar los tags a los primeros 10
+        m
+
+        // Definir las palabras clave a excluir
+        val excludeKeywords = listOf("lyrics", "karaoke", "#shorts", "lyric", "live", "cover", "festival", "sub")
+
+        spotifyService.searchSongsByTags(limitedTags) { songsByTags ->
+            spotifyService.searchSongsByArtist(artist) { songsByArtist ->
+                if (songsByTags != null && songsByArtist != null) {
+                    val combinedSongs = (songsByArtist.take(3) + songsByTags)
+                        .shuffled()
+                        .distinct()
+                        .take(20)
+
+                    // Filtrar canciones que contienen palabras clave excluidas en el nombre o en los tags
+                    val filteredSongs = combinedSongs.filterNot { song ->
+                        // Comprobar si el nombre de la canción o algún tag contiene las palabras clave a excluir
+                        song.name.containsAny(excludeKeywords, ignoreCase = true) ||
+                                song.tags.any { it.containsAny(excludeKeywords, ignoreCase = true) }
+                    }
+
+                    // Log de las canciones filtradas
+                    filteredSongs.forEach { song ->
+                        Log.d("ResultsSearchActivity", "Found song: ${song.name} by ${song.artist}")
+                    }
+
+                    // Update the UI with the filtered songs
+                    runOnUiThread {
+                        adapter.updateResults(filteredSongs)
+                    }
+                } else {
+                    Log.d("ResultsSearchActivity", "No songs found with the given tags or artist.")
+                }
+            }
+        }
+    }
+
+    // Extensión para comprobar si el texto contiene alguna de las palabras clave (sin importar mayúsculas/minúsculas)
+    private fun String.containsAny(keywords: List<String>, ignoreCase: Boolean = false): Boolean {
+        return keywords.any { this.contains(it, ignoreCase) }
+    }
+
 }
+

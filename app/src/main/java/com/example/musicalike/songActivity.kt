@@ -10,16 +10,19 @@ import com.google.firebase.firestore.FirebaseFirestore
 import android.os.Parcel
 import android.os.Parcelable
 
+
 data class Song(
     var name: String,   // Nombre de la canción
     var artist: String, // Nombre del artista
     val tags: List<String> = listOf(),
+    var tempo: Float = 0f, // Campo de tempo
     var isFavorite: Boolean = false // Indicador de favorito
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.createStringArrayList() ?: emptyList(),
+        parcel.readFloat(), // Leer tempo desde Parcel
         parcel.readByte() != 0.toByte()
     )
 
@@ -27,6 +30,7 @@ data class Song(
         parcel.writeString(name)
         parcel.writeString(artist)
         parcel.writeStringList(tags)
+        parcel.writeFloat(tempo) // Escribir tempo a Parcel
         parcel.writeByte(if (isFavorite) 1 else 0)
     }
 
@@ -43,14 +47,18 @@ data class Song(
             return arrayOfNulls(size)
         }
     }
-}
-
-class SongAdapter(
-    private val songs: MutableList<Song>,
+}class SongAdapter(
+    private var songs: List<Song>,
     private val userEmail: String,
     private val onFavoriteClicked: (Song) -> Unit,
-    private val onSongClicked: (Song) -> Unit // Callback para el click en la canción
+    private val onSongClicked: (Song) -> Unit
 ) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
+
+    inner class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val songNameTextView: TextView = itemView.findViewById(R.id.songNameTextView)
+        val artistNameTextView: TextView = itemView.findViewById(R.id.artistNameTextView)
+        val favoriteButton: ImageView = itemView.findViewById(R.id.favoriteButton)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_song, parent, false)
@@ -59,44 +67,29 @@ class SongAdapter(
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         val song = songs[position]
-        holder.bind(song, onFavoriteClicked, onSongClicked)
-    }
+        holder.songNameTextView.text = song.name
+        holder.artistNameTextView.text = song.artist
+        holder.favoriteButton.setImageResource(
+            if (song.isFavorite) R.drawable.star_point_icon else R.drawable.star_icon
+        )
 
-    override fun getItemCount(): Int = songs.size
+        holder.favoriteButton.setOnClickListener {
+            onFavoriteClicked(song)
+        }
 
-    fun updateResults(newSongs: List<Song>) {
-        songs.clear()
-        songs.addAll(newSongs)
-        notifyDataSetChanged()
-    }
-
-    inner class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val songNameTextView: TextView = itemView.findViewById(R.id.songNameTextView)
-        private val artistNameTextView: TextView = itemView.findViewById(R.id.artistNameTextView)
-        private val favoriteButton: ImageView = itemView.findViewById(R.id.favoriteButton)
-
-        fun bind(song: Song, onFavoriteClicked: (Song) -> Unit, onSongClicked: (Song) -> Unit) {
-            songNameTextView.text = song.name
-            artistNameTextView.text = song.artist
-
-            // Cambiar el ícono del botón de favorito según el estado de la canción
-            favoriteButton.setImageResource(
-                if (song.isFavorite) R.drawable.star_point_icon else R.drawable.star_icon
-            )
-
-            favoriteButton.setOnClickListener {
-                // Alternar el estado de favorito
-                song.isFavorite = !song.isFavorite
-                favoriteButton.setImageResource(
-                    if (song.isFavorite) R.drawable.star_point_icon else R.drawable.star_icon
-                )
-                onFavoriteClicked(song)
-            }
-
-            itemView.setOnClickListener {
-                // Llamar al callback cuando se hace click en la canción
-                onSongClicked(song)
-            }
+        holder.itemView.setOnClickListener {
+            onSongClicked(song)
         }
     }
+
+    override fun getItemCount() = songs.size
+
+    fun updateResults(newSongs: List<Song>) {
+        songs = newSongs
+        notifyDataSetChanged()
+    }
+    fun getSongs(): List<Song> {
+        return songs
+    }
 }
+

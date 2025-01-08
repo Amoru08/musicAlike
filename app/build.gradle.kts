@@ -45,7 +45,9 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
-
+    implementation ("com.google.android.gms:play-services-auth:20.2.0")
+    implementation ("com.google.firebase:firebase-firestore:24.0.0")
+    implementation ("com.google.firebase:firebase-auth:21.0.5")
     // Spotify Authentication
     implementation("com.spotify.android:auth:1.2.3")
     implementation("com.google.android.gms:play-services-auth:20.6.0")

@@ -13,9 +13,10 @@
         android:layout_width="371dp"
         android:layout_height="108dp"
         android:text="Bienvenido"
-        android:fontFamily="@font/claire_palmer_script"
+        android:fontFamily="@font/circular_std_2"
         android:textColor="#074086"
-        android:textSize="60sp"
+        android:textSize="70dp"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.659"
@@ -34,6 +35,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:fontFamily="@font/circular_std_2"
         app:layout_constraintVertical_bias="0.322" />
 
 
@@ -44,6 +46,7 @@
         android:background="@color/dark_primary"
         android:text="Inicio de Sesion"
         android:textSize="20dp"
+        android:fontFamily="@font/circular_std_2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.628"

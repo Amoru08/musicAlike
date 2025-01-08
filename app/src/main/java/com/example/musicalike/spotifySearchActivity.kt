@@ -42,7 +42,7 @@ class SpotifySearchActivity : AppCompatActivity() {
             mutableListOf(),
             userEmail!!,
             onFavoriteClicked = { song -> onFavoriteClicked(song) },
-            onSongClicked = { song -> onSongClicked(song) } // Pasar el callback para el click en la canción
+            onSongClicked = { song -> navigateToResults(song) } // Pasar el callback para el click en la canción
         )
         resultsRecyclerView.layoutManager = LinearLayoutManager(this)
         resultsRecyclerView.adapter = adapter
@@ -177,70 +177,65 @@ class SpotifySearchActivity : AppCompatActivity() {
             Log.d("SpotifySearchActivity", "Favorite clicked for song: ${song.name}")
             val cleanedSongName = cleanSongName(song.name)
 
-            spotifyService.getArtistGenres(song.artist) { genres ->
-                Log.d("SpotifySearchActivity", "Genres from Spotify: $genres")
-                if (genres != null) {
-                    val favoriteSong = mapOf(
-                        "Nombre" to cleanedSongName,
-                        "Artista" to song.artist,
-                        "Tags" to genres
-                    )
+            val userRef = firestoreDb.collection("users").document(email).collection("favoritos")
+            userRef.whereEqualTo("Nombre", cleanedSongName)
+                .whereEqualTo("Artista", song.artist)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if (documents.isEmpty) {
+                        // Agregar a favoritos
+                        spotifyService.getArtistGenres(song.artist) { genres ->
+                            Log.d("SpotifySearchActivity", "Genres from Spotify: $genres")
+                            if (genres != null) {
+                                val favoriteSong = mapOf(
+                                    "Nombre" to cleanedSongName,
+                                    "Artista" to song.artist,
+                                    "Tags" to genres
+                                )
 
-                    firestoreDb.collection("users").document(email).collection("favoritos")
-                        .add(favoriteSong)
-                        .addOnSuccessListener {
-                            Toast.makeText(this, "Canción guardada como favorita", Toast.LENGTH_SHORT).show()
+                                userRef.add(favoriteSong)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(this, "Canción guardada como favorita", Toast.LENGTH_SHORT).show()
+                                        song.isFavorite = true
+                                        adapter.notifyDataSetChanged()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("SpotifySearchActivity", "Error al guardar la canción favorita: ${e.message}")
+                                        Toast.makeText(this, "Error al guardar la canción favorita: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("SpotifySearchActivity", "Error al guardar la canción favorita: ${e.message}")
-                            Toast.makeText(this, "Error al guardar la canción favorita: ${e.message}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Eliminar de favoritos
+                        for (document in documents) {
+                            userRef.document(document.id).delete()
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, "Canción eliminada de favoritos", Toast.LENGTH_SHORT).show()
+                                    song.isFavorite = false
+                                    adapter.notifyDataSetChanged()
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("SpotifySearchActivity", "Error al eliminar la canción favorita: ${e.message}")
+                                    Toast.makeText(this, "Error al eliminar la canción favorita: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
                         }
+                    }
                 }
-            }
+                .addOnFailureListener { e ->
+                    Log.e("SpotifySearchActivity", "Error al verificar favoritos: ${e.message}")
+                    Toast.makeText(this, "Error al verificar favoritos: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 
     private fun onSongClicked(song: Song) {
         Log.d("SpotifySearchActivity", "Song clicked: ${song.name} by ${song.artist}")
-        // Obtener los tags de Firestore
-        getSongTagsFromFirestore(song)
+        navigateToResults(song)
     }
 
-    private fun getSongTagsFromFirestore(song: Song) {
-        firestoreDb.collection("users").document(userEmail!!).collection("favoritos")
-            .whereEqualTo("Nombre", song.name)
-            .whereEqualTo("Artista", song.artist)
-            .get()
-            .addOnSuccessListener { documents ->
-                val tags = documents.flatMap { it.get("Tags") as? List<String> ?: emptyList() }
-                if (tags.isNotEmpty()) {
-                    Log.d("SpotifySearchActivity", "Tags found: $tags")
-                    searchSongsByTags(tags)
-                } else {
-                    Log.d("SpotifySearchActivity", "No tags available for search.")
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("SpotifySearchActivity", "Error getting tags: ${e.message}")
-            }
-    }
-    private fun searchSongsByTags(tags: List<String>) {
-        if (tags.isEmpty()) {
-            Log.d("SpotifySearchActivity", "No tags available for search.")
-            return
-        }
-
-        // Limitar los tags a los primeros 10
-        val limitedTags = tags.take(10)
-        spotifyService.searchSongsByTags(limitedTags) { songs ->
-            if (songs != null) {
-                // Log the first 10 songs found
-                songs.take(10).forEach { song ->
-                    Log.d("SpotifySearchActivity", "Found song: ${song.name} by ${song.artist}")
-                }
-            } else {
-                Log.d("SpotifySearchActivity", "No songs found with the given tags.")
-            }
-        }
+    private fun navigateToResults(song: Song) {
+        val intent = Intent(this, ResultsSearchActivity::class.java)
+        intent.putExtra("selectedSong", song)
+        startActivity(intent)
     }
 }

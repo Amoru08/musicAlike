@@ -22,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Buscar canción..."
+            android:fontFamily="@font/circular_std_2"
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -31,6 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Buscar"
+        android:fontFamily="@font/circular_std_2"
         app:layout_constraintTop_toBottomOf="@id/searchInputLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
