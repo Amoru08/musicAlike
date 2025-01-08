@@ -2,6 +2,7 @@ package com.example.musicalike
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,8 +47,11 @@ class ResultsSearchActivity : AppCompatActivity() {
         // Obtener la canción seleccionada pasada a través del Intent
         selectedSong = intent.getParcelableExtra("selectedSong") ?: return
 
-        // Obtener los tags de Firestore y buscar canciones similares
-        getTagsFromFirestoreAndSearchSongs(selectedSong)
+        // Capturar los logs cuando se selecciona una canción
+        logSongDetails(selectedSong)
+
+        // Realizar la búsqueda basada en los logs
+        searchSongsByLogs(selectedSong)
     }
 
     private fun onFavoriteClicked(song: Song) {
@@ -81,73 +85,55 @@ class ResultsSearchActivity : AppCompatActivity() {
         Toast.makeText(this, "Has seleccionado: ${song.name} de ${song.artist}", Toast.LENGTH_SHORT).show()
     }
 
-    private fun getTagsFromFirestoreAndSearchSongs(song: Song) {
-        firestoreDb.collection("users").document(userEmail!!).collection("favoritos")
-            .whereEqualTo("Nombre", song.name)
-            .whereEqualTo("Artista", song.artist)
-            .get()
-            .addOnSuccessListener { documents ->
-                val tags = documents.flatMap { it.get("Tags") as? List<String> ?: emptyList() }
-                if (tags.isNotEmpty()) {
-                    Log.d("ResultsSearchActivity", "Tags found: $tags")
-                    searchSongsByTagsAndArtist(tags, song.artist)
-                } else {
-                    Log.d("ResultsSearchActivity", "No tags available for search.")
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("ResultsSearchActivity", "Error getting tags: ${e.message}")
-                Toast.makeText(this, "Error obteniendo los tags: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+    private fun logSongDetails(song: Song) {
+        // Capturar los detalles de la canción en los logs
+        Log.d("ResultsSearchActivity", "Selected song details - Name: ${song.name}, Artist: ${song.artist}, Tags: ${song.tags}")
     }
 
-    private fun searchSongsByTagsAndArtist(tags: List<String>, artist: String) {
-        if (tags.isEmpty()) {
-            Log.d("ResultsSearchActivity", "No tags available for search.")
-            return
-        }
+    private fun searchSongsByLogs(selectedSong: Song) {
+        // Obtener la información de los logs
+        val logs = "Name: ${selectedSong.name}, Artist: ${selectedSong.artist}, Tags: ${selectedSong.tags.joinToString(", ")}"
 
-        // Limitar los tags a los primeros 10
-        val limitedTags = tags.take(10)
-
-        // Definir las palabras clave a excluir
-        val excludeKeywords = listOf("lyrics", "karaoke", "#shorts", "lyric", "live", "cover", "festival", "sub")
-
-        spotifyService.searchSongsByTags(limitedTags) { songsByTags ->
-            spotifyService.searchSongsByArtist(artist) { songsByArtist ->
-                if (songsByTags != null && songsByArtist != null) {
-                    val combinedSongs = (songsByArtist.take(3) + songsByTags)
-                        .shuffled()
-                        .distinct()
-                        .take(20)
-
-                    // Filtrar canciones que contienen palabras clave excluidas en el nombre o en los tags
-                    val filteredSongs = combinedSongs.filterNot { song ->
-                        // Comprobar si el nombre de la canción o algún tag contiene las palabras clave a excluir
-                        song.name.containsAny(excludeKeywords, ignoreCase = true) ||
-                                song.tags.any { it.containsAny(excludeKeywords, ignoreCase = true) }
-                    }
-
-                    // Log de las canciones filtradas
-                    filteredSongs.forEach { song ->
-                        Log.d("ResultsSearchActivity", "Found song: ${song.name} by ${song.artist}")
-                    }
-
-                    // Update the UI with the filtered songs
-                    runOnUiThread {
-                        adapter.updateResults(filteredSongs)
-                    }
-                } else {
-                    Log.d("ResultsSearchActivity", "No songs found with the given tags or artist.")
+        // Buscar canciones utilizando la información de los logs
+        spotifyService.searchSongsByLogs(logs) { songsByLogs ->
+            if (songsByLogs != null) {
+                // Log the found songs
+                songsByLogs.take(20).forEach { song ->
+                    Log.d("ResultsSearchActivity", "Found song: ${song.name} by ${song.artist}")
                 }
+
+                // Update the UI with the found songs
+                runOnUiThread {
+                    adapter.updateResults(songsByLogs.take(20))
+                }
+            } else {
+                Log.d("ResultsSearchActivity", "No songs found with the given logs.")
             }
         }
     }
 
-    // Extensión para comprobar si el texto contiene alguna de las palabras clave (sin importar mayúsculas/minúsculas)
-    private fun String.containsAny(keywords: List<String>, ignoreCase: Boolean = false): Boolean {
-        return keywords.any { this.contains(it, ignoreCase) }
-    }
+    private fun savePlaylist() {
+        userEmail?.let { email ->
+            val playlistName = "My Playlist"
+            val playlist = mapOf(
+                "name" to playlistName,
+                "songs" to adapter.getSongs().map { song ->
+                    mapOf(
+                        "name" to song.name,
+                        "artist" to song.artist
+                    )
+                }
+            )
 
+            firestoreDb.collection("users").document(email).collection("playlists")
+                .add(playlist)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Playlist guardada exitosamente", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("ResultsSearchActivity", "Error al guardar la playlist: ${e.message}")
+                    Toast.makeText(this, "Error al guardar la playlist: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
 }
-
