@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -11,24 +12,34 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher1"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher1_round"
         android:supportsRtl="true"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.MusicAlike"
         tools:targetApi="31">
 
+        <activity
+        android:name=".viewPlaylistActivity"
+        android:exported="true" />
+
+        <activity
+            android:name=".PlaylistDetailsActivity"
+            android:exported="true" />
+
+
+        <!-- Configuración de Google Auth para Spotify -->
         <meta-data
             android:name="com.google.android.gms.auth.api.credentials.CREDENTIALS"
             android:value="@string/google_client_id"
             tools:node="replace" />
 
-        <!-- HomeActivity manejará la redirección de Spotify -->
+        <!-- HomeActivity para la redirección de Spotify -->
         <activity
             android:name=".HomeActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask">
-            <!-- Elimina el intent-filter si no quieres que HomeActivity se inicie a través de un esquema de URL -->
+            <!-- No es necesario un intent-filter para la actividad principal si se inicia a través de MainActivity -->
         </activity>
 
         <!-- MainActivity como actividad principal -->
@@ -44,8 +55,12 @@
         <!-- Actividades adicionales -->
         <activity android:name=".si_registrado" />
         <activity android:name=".no_registrado" />
-        <activity android:name=".SpotifyDetailsActivity" android:exported="true" />
-        <activity android:name=".SpotifySearchActivity" android:exported="true" />
+        <activity
+            android:name=".SpotifyDetailsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".SpotifySearchActivity"
+            android:exported="true" />
         <activity
             android:name=".SpotifyUserActivity"
             android:exported="true"
@@ -54,12 +69,17 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="musicalike" android:host="callback" />
+                <data
+                    android:host="callback"
+                    android:scheme="musicalike" />
             </intent-filter>
         </activity>
 
-        <!-- Declarar la actividad ResultsSearchActivity aquí -->
-        <activity android:name=".ResultsSearchActivity" android:exported="true" />
+        <!-- Actividad ResultsSearchActivity -->
+        <activity
+            android:name=".ResultsSearchActivity"
+            android:exported="true" />
+
     </application>
 
 </manifest>

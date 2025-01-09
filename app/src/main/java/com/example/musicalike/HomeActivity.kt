@@ -15,6 +15,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var buton: Button
     private lateinit var buscarButton: Button
     private lateinit var usurSpot: Button
+    private lateinit var playlists: Button
 
     private val auth = FirebaseAuth.getInstance()
 
@@ -33,6 +34,7 @@ class HomeActivity : AppCompatActivity() {
         buton = findViewById(R.id.buttonHome)
         buscarButton = findViewById(R.id.buscar)
         usurSpot = findViewById(R.id.usuario)
+        playlists = findViewById(R.id.playlists)
 
         buscarButton.setOnClickListener {
             val intent = Intent(this, SpotifySearchActivity::class.java).apply {
@@ -48,10 +50,19 @@ class HomeActivity : AppCompatActivity() {
         usurSpot.setOnClickListener {
             startSpotifyAuth()
         }
+
+        playlists.setOnClickListener {
+            goToPlaylist()
+        }
+
     }
 
     private fun startSpotifyAuth() {
         val i = Intent(this, SpotifyUserActivity::class.java)
+        startActivity(i)
+    }
+    private fun goToPlaylist() {
+        val i = Intent(this, viewPlaylistActivity::class.java)
         startActivity(i)
     }
 

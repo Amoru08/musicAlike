@@ -195,7 +195,6 @@ class SpotifySearchActivity : AppCompatActivity() {
 
                                 userRef.add(favoriteSong)
                                     .addOnSuccessListener {
-                                        Toast.makeText(this, "Canción guardada como favorita", Toast.LENGTH_SHORT).show()
                                         song.isFavorite = true
                                         adapter.notifyDataSetChanged()
                                     }
