@@ -79,6 +79,10 @@
         <activity
             android:name=".ResultsSearchActivity"
             android:exported="true" />
+        <activity
+            android:name=".PlaylistsActivity"
+            android:exported="true" />
+
 
     </application>
 

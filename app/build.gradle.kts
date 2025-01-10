@@ -61,6 +61,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.8")
     implementation("com.google.apis:google-api-services-youtube:v3-rev222-1.25.0")
     implementation("com.google.http-client:google-http-client-jackson2:1.42.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
     // Spotify Authentication
     implementation("com.spotify.android:auth:1.2.3")

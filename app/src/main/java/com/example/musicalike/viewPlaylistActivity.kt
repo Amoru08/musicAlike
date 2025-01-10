@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import android.content.Intent
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,25 +19,28 @@ import com.google.firebase.firestore.FirebaseFirestore
 class viewPlaylistActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var save : Button
     private lateinit var adapter: PlaylistAdapter
     private val firestoreDb = FirebaseFirestore.getInstance()
     private val playlists = mutableListOf<Playlist>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_view_playlist) // Asegúrate de tener este layout
-
-        recyclerView = findViewById(R.id.playlistRecyclerView)
+        setContentView(R.layout.activity_view_playlist)
+        recyclerView = findViewById(R.id.songsRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter = PlaylistAdapter(playlists) { playlist ->
-            val intent = Intent(this, PlaylistDetailsActivity::class.java)
-            intent.putExtra("playlistId", playlist.id) // Enviar ID de playlist
+            // En viewPlaylistActivity (cuando el usuario selecciona una playlist)
+            val intent = Intent(this, PlaylistsActivity::class.java)
+            intent.putExtra("playlistId", playlist.id) // Pasar el ID de la playlist seleccionada
             startActivity(intent)
+
         }
         recyclerView.adapter = adapter
 
         loadPlaylists()
+
     }
 
     private fun loadPlaylists() {
