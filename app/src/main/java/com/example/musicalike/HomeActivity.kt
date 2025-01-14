@@ -16,6 +16,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var buscarButton: Button
     private lateinit var usurSpot: Button
     private lateinit var playlists: Button
+    private lateinit var favorites: Button
 
     private val auth = FirebaseAuth.getInstance()
 
@@ -35,6 +36,7 @@ class HomeActivity : AppCompatActivity() {
         buscarButton = findViewById(R.id.buscar)
         usurSpot = findViewById(R.id.usuario)
         playlists = findViewById(R.id.playlists)
+        favorites = findViewById(R.id.favorites)
 
         buscarButton.setOnClickListener {
             val intent = Intent(this, SpotifySearchActivity::class.java).apply {
@@ -54,6 +56,9 @@ class HomeActivity : AppCompatActivity() {
         playlists.setOnClickListener {
             goToPlaylist()
         }
+        favorites.setOnClickListener {
+            goToFavorites()
+        }
 
     }
 
@@ -63,6 +68,10 @@ class HomeActivity : AppCompatActivity() {
     }
     private fun goToPlaylist() {
         val i = Intent(this, viewPlaylistActivity::class.java)
+        startActivity(i)
+    }
+    private fun goToFavorites() {
+        val i = Intent(this, ViewFavoritesActivity::class.java)
         startActivity(i)
     }
 

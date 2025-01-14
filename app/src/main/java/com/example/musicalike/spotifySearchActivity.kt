@@ -112,6 +112,8 @@ class SpotifySearchActivity : AppCompatActivity() {
                 val snippet = video.getJSONObject("snippet")
                 val videoTitle = snippet.getString("title")
                 val channelTitle = snippet.getString("channelTitle")
+                val videoId = video.getJSONObject("id").getString("videoId")
+                val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
 
                 if (isSong(videoTitle)) {
                     val tagsArray = snippet.optJSONArray("tags")
@@ -123,7 +125,7 @@ class SpotifySearchActivity : AppCompatActivity() {
                     }
 
                     val cleanArtistName = cleanArtistName(channelTitle)
-                    val song = Song(videoTitle, cleanArtistName, tags)
+                    val song = Song(videoTitle, cleanArtistName, youtubeUrl, tags)
                     videos.add(song)
                 }
             }
@@ -190,7 +192,8 @@ class SpotifySearchActivity : AppCompatActivity() {
                                 val favoriteSong = mapOf(
                                     "Nombre" to cleanedSongName,
                                     "Artista" to song.artist,
-                                    "Tags" to genres
+                                    "Tags" to genres,
+                                    "YoutubeUrl" to song.youtubeUrl // Guardar URL de YouTube
                                 )
 
                                 userRef.add(favoriteSong)

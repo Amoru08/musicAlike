@@ -26,7 +26,6 @@
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Botón para iniciar la búsqueda -->
     <Button
         android:id="@+id/searchButton"
         android:layout_width="wrap_content"
@@ -38,7 +37,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <!-- ScrollView para envolver el RecyclerView -->
     <android.widget.ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -46,13 +44,26 @@
         app:layout_constraintTop_toBottomOf="@id/searchButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/backButton">
 
-        <!-- RecyclerView para mostrar los resultados -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/resultsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:listitem="@android:layout/simple_list_item_1"/>
     </android.widget.ScrollView>
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="110dp"
+        android:layout_height="53dp"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Atrás"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,15 +19,24 @@
             android:text="Guardar Playlist"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true" />
     </RelativeLayout>
 
     <!-- RecyclerView to display the list of songs -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/songRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:padding="16dp"
         tools:listitem="@layout/activity_song" />
 
+    <!-- Botón de Atrás -->
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Atrás"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp" />
 </LinearLayout>

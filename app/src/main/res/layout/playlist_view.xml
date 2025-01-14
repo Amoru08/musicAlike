@@ -25,4 +25,5 @@
             android:text="Nombre de la playlist"/>
 
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

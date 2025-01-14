@@ -12,25 +12,25 @@ import android.os.Parcelable
 
 
 data class Song(
-    var name: String,   // Nombre de la canción
-    var artist: String, // Nombre del artista
+    var name: String,
+    var artist: String,
+    var youtubeUrl: String = "",
     val tags: List<String> = listOf(),
-    var tempo: Float = 0f, // Campo de tempo
-    var isFavorite: Boolean = false // Indicador de favorito
+    var isFavorite: Boolean = false
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
+        parcel.readString() ?: "",
         parcel.createStringArrayList() ?: emptyList(),
-        parcel.readFloat(), // Leer tempo desde Parcel
         parcel.readByte() != 0.toByte()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)
         parcel.writeString(artist)
+        parcel.writeString(youtubeUrl)
         parcel.writeStringList(tags)
-        parcel.writeFloat(tempo) // Escribir tempo a Parcel
         parcel.writeByte(if (isFavorite) 1 else 0)
     }
 
@@ -87,8 +87,9 @@ class SongAdapter(
 
     fun updateResults(newSongs: List<Song>) {
         songs = newSongs
-        notifyDataSetChanged()  // Notifica al RecyclerView que los datos han cambiado
+        notifyDataSetChanged()
     }
+
     fun getSongs(): List<Song> {
         return songs
     }

@@ -8,6 +8,20 @@
     tools:ignore="MissingClass">
 
 
+    <Button
+        android:id="@+id/favorites"
+        android:layout_width="141dp"
+        android:layout_height="146dp"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Ver canciones favoritas"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.888"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars"
+        app:layout_constraintVertical_bias="0.499" />
+
     <TextView
         android:id="@+id/textView4"
         android:layout_width="278dp"
@@ -41,14 +55,14 @@
         android:id="@+id/buscar"
         android:layout_width="165dp"
         android:layout_height="62dp"
-        android:text="Buscar cancion"
         android:fontFamily="@font/circular_std_2"
+        android:text="Buscar cancion"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.113"
+        app:layout_constraintHorizontal_bias="0.101"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.312" />
+        app:layout_constraintVertical_bias="0.281" />
 
     <Button
         android:id="@+id/playlists"
@@ -67,25 +81,26 @@
         android:id="@+id/usuario"
         android:layout_width="169dp"
         android:layout_height="58dp"
-        android:text="Agregar Usuario"
         android:fontFamily="@font/circular_std_2"
+        android:text="Agregar Usuario"
         android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.933"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.31" />
+        app:layout_constraintVertical_bias="0.284" />
 
     <ImageButton
         android:id="@+id/imageButton2"
-        android:layout_width="90dp"
-        android:layout_height="115dp"
+        android:layout_width="60dp"
+        android:layout_height="52dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.897"
+        app:layout_constraintHorizontal_bias="0.017"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.019"
         tools:srcCompat="@tools:sample/avatars" />
 
 

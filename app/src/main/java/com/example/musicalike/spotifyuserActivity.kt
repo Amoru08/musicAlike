@@ -17,6 +17,8 @@ class SpotifyUserActivity : AppCompatActivity() {
     private lateinit var detailButton: Button
     private lateinit var loginButton: Button
     private lateinit var signOutButton: Button
+    private lateinit var exit: Button
+
     private val requestCode = 9001
 
     private val firestoreDb = FirebaseFirestore.getInstance()
@@ -28,12 +30,15 @@ class SpotifyUserActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.authButton)
         detailButton = findViewById(R.id.detalles)
         signOutButton = findViewById(R.id.signOutButton)
+        exit = findViewById(R.id.exit)
 
         loginButton.setOnClickListener { authenticateWithGoogle() }
 
         detailButton.setOnClickListener { goToDetalles() }
 
         signOutButton.setOnClickListener { signOutFromGoogle() }
+
+        exit.setOnClickListener { goToHome() }
     }
 
     private fun authenticateWithGoogle() {
@@ -89,6 +94,10 @@ class SpotifyUserActivity : AppCompatActivity() {
 
     private fun goToDetalles() {
         val i = Intent(this, SpotifyDetailsActivity::class.java)
+        startActivity(i)
+    }
+    private fun goToHome() {
+        val i = Intent(this, HomeActivity::class.java)
         startActivity(i)
     }
 

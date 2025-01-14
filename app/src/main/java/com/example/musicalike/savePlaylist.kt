@@ -69,10 +69,7 @@ class PlaylistsActivity : AppCompatActivity() {
             Toast.makeText(this, "Se ha clickado en el botón de guardar", Toast.LENGTH_SHORT).show()
             saveSongsToYouTube()
         }
-    }
-
-    // Cargar canciones desde Firestore usando el playlistId
-    private fun loadSongsFromPlaylist(playlistId: String, userEmail: String) {
+    }private fun loadSongsFromPlaylist(playlistId: String, userEmail: String) {
         firestoreDb.collection("users")
             .document(userEmail)
             .collection("playlists")
@@ -105,6 +102,9 @@ class PlaylistsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al cargar canciones: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    // Cargar canciones desde Firestore usando el playlistId
+
 
     // Lógica para subir las canciones a YouTube
     private fun saveSongsToYouTube() {
