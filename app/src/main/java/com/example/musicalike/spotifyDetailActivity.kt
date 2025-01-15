@@ -1,6 +1,8 @@
 package com.example.musicalike
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,17 +13,19 @@ class SpotifyDetailsActivity : AppCompatActivity() {
 
     private lateinit var userNameTextView: TextView
     private lateinit var userEmailTextView: TextView
+    private lateinit var exit: Button
     private val firestoreDb = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_spotify_detail)
 
-        // Inicializar vistas
+        exit=findViewById(R.id.backButton)
         userNameTextView = findViewById(R.id.userNameTextView)
         userEmailTextView = findViewById(R.id.userEmailTextView)
 
-        // Recuperar el email del usuario autenticado (Google Sign In)
+        exit.setOnClickListener { goToBack() }
+
         val currentUserEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
 
         if (currentUserEmail != null) {
@@ -51,5 +55,9 @@ class SpotifyDetailsActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al obtener los detalles: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+    private fun goToBack() {
+        val i = Intent(this, SpotifyUserActivity::class.java)
+        startActivity(i)
     }
 }

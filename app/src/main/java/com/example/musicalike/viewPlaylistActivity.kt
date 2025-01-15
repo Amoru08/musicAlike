@@ -19,7 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class viewPlaylistActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var save : Button
+    private lateinit var exit : Button
     private lateinit var adapter: PlaylistAdapter
     private val firestoreDb = FirebaseFirestore.getInstance()
     private val playlists = mutableListOf<Playlist>()
@@ -28,7 +28,10 @@ class viewPlaylistActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_playlist)
         recyclerView = findViewById(R.id.songsRecyclerView)
+        exit=findViewById(R.id.backButton)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        exit.setOnClickListener { goToHome() }
 
         adapter = PlaylistAdapter(playlists) { playlist ->
             // En viewPlaylistActivity (cuando el usuario selecciona una playlist)
@@ -67,6 +70,10 @@ class viewPlaylistActivity : AppCompatActivity() {
                 Log.e("PlaylistsActivity", "Error al cargar playlists: ${e.message}")
                 Toast.makeText(this, "Error al cargar playlists", Toast.LENGTH_SHORT).show()
             }
+    }
+    private fun goToHome() {
+        val i = Intent(this, HomeActivity::class.java)
+        startActivity(i)
     }
 }
 

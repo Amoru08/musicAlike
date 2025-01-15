@@ -53,7 +53,8 @@
             android:fontFamily="@font/circular_std_2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/backButton"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginEnd="8dp"
+            tools:ignore="MissingConstraints" />
 
         <!-- Botón Atrás -->
         <Button
@@ -64,7 +65,8 @@
             android:fontFamily="@font/circular_std_2"
             app:layout_constraintStart_toEndOf="@id/saveButton"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            tools:ignore="MissingConstraints" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,5 +1,6 @@
 package com.example.musicalike
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -19,6 +20,7 @@ class ResultsSearchActivity : AppCompatActivity() {
     private val firestoreDb = FirebaseFirestore.getInstance()
     private var userEmail: String? = null
     private lateinit var selectedSong: Song
+    private lateinit var exit: Button
     private val spotifyService = SpotifyService("d95be9b432a2437c913e965dcd72487d", "73b6598e631e4e51834db25238b82b32") // Reemplaza con tus credenciales
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,10 +28,12 @@ class ResultsSearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_results_search)
 
         Log.d("ResultsSearchActivity", "onCreate called")
-
+        exit=findViewById(R.id.backButton)
         savePlaylist = findViewById(R.id.savePlaylistButton) // Botón de guardar playlist
         songRecyclerView = findViewById(R.id.songRecyclerView)
         userEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
+
+        exit.setOnClickListener { goToSearch() }
 
         if (userEmail == null) {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
@@ -191,5 +195,9 @@ class ResultsSearchActivity : AppCompatActivity() {
                 Log.e("ResultsSearchActivity", "Error al guardar las canciones en la playlist: ${e.message}")
                 Toast.makeText(this, "Error al guardar las canciones en la playlist: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+    private fun goToSearch() {
+        val i = Intent(this, SpotifySearchActivity::class.java)
+        startActivity(i)
     }
 }

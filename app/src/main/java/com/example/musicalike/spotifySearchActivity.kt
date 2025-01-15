@@ -20,6 +20,7 @@ class SpotifySearchActivity : AppCompatActivity() {
 
     private lateinit var searchField: TextInputEditText
     private lateinit var resultsRecyclerView: RecyclerView
+    private lateinit var exit:Button
     private lateinit var adapter: SongAdapter
     private val spotifyService = SpotifyService("d95be9b432a2437c913e965dcd72487d", "73b6598e631e4e51834db25238b82b32") // Reemplaza con tus credenciales
     private var userEmail: String? = null
@@ -37,6 +38,7 @@ class SpotifySearchActivity : AppCompatActivity() {
         }
 
         searchField = findViewById(R.id.agregarCancion)
+        exit=findViewById(R.id.backButton)
         resultsRecyclerView = findViewById(R.id.resultsRecyclerView)
         adapter = SongAdapter(
             mutableListOf(),
@@ -46,6 +48,8 @@ class SpotifySearchActivity : AppCompatActivity() {
         )
         resultsRecyclerView.layoutManager = LinearLayoutManager(this)
         resultsRecyclerView.adapter = adapter
+
+        exit.setOnClickListener { goToHome() }
 
         val searchButton: Button = findViewById(R.id.searchButton)
         searchButton.setOnClickListener {
@@ -239,5 +243,9 @@ class SpotifySearchActivity : AppCompatActivity() {
         val intent = Intent(this, ResultsSearchActivity::class.java)
         intent.putExtra("selectedSong", song)
         startActivity(intent)
+    }
+    private fun goToHome() {
+        val i = Intent(this, HomeActivity::class.java)
+        startActivity(i)
     }
 }

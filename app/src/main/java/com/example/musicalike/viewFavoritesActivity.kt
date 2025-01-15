@@ -1,10 +1,12 @@
 package com.example.musicalike
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,18 +19,21 @@ class ViewFavoritesActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: FavoriteSongsAdapter
+    private lateinit var exit: Button
     private val firestoreDb = FirebaseFirestore.getInstance()
     private val favoriteSongs = mutableListOf<Song>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_favorites)
-
+        exit=findViewById(R.id.backButton)
         recyclerView = findViewById(R.id.favoritesRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter = FavoriteSongsAdapter(favoriteSongs)
         recyclerView.adapter = adapter
+
+        exit.setOnClickListener { goToHome() }
 
         loadFavoriteSongs()
     }
@@ -58,6 +63,10 @@ class ViewFavoritesActivity : AppCompatActivity() {
                 Log.e("ViewFavoritesActivity", "Error al cargar canciones favoritas: ${e.message}")
                 Toast.makeText(this, "Error al cargar canciones favoritas", Toast.LENGTH_SHORT).show()
             }
+    }
+    private fun goToHome() {
+        val i = Intent(this, HomeActivity::class.java)
+        startActivity(i)
     }
 }
 

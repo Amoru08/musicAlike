@@ -1,5 +1,6 @@
 package com.example.musicalike
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -23,6 +24,7 @@ class PlaylistsActivity : AppCompatActivity() {
     private val firestoreDb = FirebaseFirestore.getInstance()
     private lateinit var playlistRecyclerView: RecyclerView
     private lateinit var save: Button
+    private lateinit var exit: Button
     private val songs = mutableListOf<Song>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +33,9 @@ class PlaylistsActivity : AppCompatActivity() {
 
         playlistRecyclerView = findViewById(R.id.songsRecyclerView)
         save = findViewById(R.id.saveButton)
+        exit=findViewById(R.id.backButton)
+
+        exit.setOnClickListener { goBack() }
 
         playlistRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -266,5 +271,8 @@ class PlaylistsActivity : AppCompatActivity() {
         if (connection.responseCode != HttpURLConnection.HTTP_OK) {
             throw Exception("Error al agregar el video a la playlist")
         }
+    }
+    private fun goBack() {
+        finish()
     }
 }
