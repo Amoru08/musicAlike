@@ -12,9 +12,9 @@ import com.google.firebase.auth.FirebaseAuth
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var textview: TextView
-    private lateinit var buton: Button
-    private lateinit var buscarButton: Button
-    private lateinit var usurSpot: Button
+    private lateinit var back: Button
+    private lateinit var search: Button
+    private lateinit var user: Button
     private lateinit var playlists: Button
     private lateinit var favorites: Button
 
@@ -32,30 +32,28 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         textview = findViewById(R.id.textView4)
-        buton = findViewById(R.id.buttonHome)
-        buscarButton = findViewById(R.id.buscar)
-        usurSpot = findViewById(R.id.usuario)
+        back = findViewById(R.id.buttonHome)
+        search = findViewById(R.id.buscar)
+        user = findViewById(R.id.usuario)
         playlists = findViewById(R.id.playlists)
         favorites = findViewById(R.id.favorites)
 
-        buscarButton.setOnClickListener {
-            val intent = Intent(this, SpotifySearchActivity::class.java).apply {
-                putExtra("USER_EMAIL", auth.currentUser?.email)
-            }
-            startActivity(intent)
+        search.setOnClickListener {
+           goToBuscar()
         }
 
-        buton.setOnClickListener {
+        back.setOnClickListener {
             goToPrincipio()
         }
 
-        usurSpot.setOnClickListener {
+        user.setOnClickListener {
             startSpotifyAuth()
         }
 
         playlists.setOnClickListener {
             goToPlaylist()
         }
+
         favorites.setOnClickListener {
             goToFavorites()
         }
@@ -73,6 +71,12 @@ class HomeActivity : AppCompatActivity() {
     private fun goToFavorites() {
         val i = Intent(this, ViewFavoritesActivity::class.java)
         startActivity(i)
+    }
+    private fun goToBuscar(){
+        val intent = Intent(this, SpotifySearchActivity::class.java).apply {
+            putExtra("USER_EMAIL", auth.currentUser?.email)
+        }
+        startActivity(intent)
     }
 
     override fun onNewIntent(intent: Intent) {

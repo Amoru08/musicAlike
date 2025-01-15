@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.DocumentReference
 
 class ResultsSearchActivity : AppCompatActivity() {
 
@@ -21,15 +20,15 @@ class ResultsSearchActivity : AppCompatActivity() {
     private var userEmail: String? = null
     private lateinit var selectedSong: Song
     private lateinit var exit: Button
-    private val spotifyService = SpotifyService("d95be9b432a2437c913e965dcd72487d", "73b6598e631e4e51834db25238b82b32") // Reemplaza con tus credenciales
+    private val spotifyService = SpotifyService("d95be9b432a2437c913e965dcd72487d", "73b6598e631e4e51834db25238b82b32")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results_search)
 
         Log.d("ResultsSearchActivity", "onCreate called")
-        exit=findViewById(R.id.backButton)
-        savePlaylist = findViewById(R.id.savePlaylistButton) // Botón de guardar playlist
+        exit = findViewById(R.id.backButton)
+        savePlaylist = findViewById(R.id.savePlaylistButton)
         songRecyclerView = findViewById(R.id.songRecyclerView)
         userEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
 
@@ -51,19 +50,13 @@ class ResultsSearchActivity : AppCompatActivity() {
         songRecyclerView.layoutManager = LinearLayoutManager(this)
         songRecyclerView.adapter = adapter
 
-        // Configurar el listener del botón para guardar la playlist
         savePlaylist.setOnClickListener {
             savePlaylist()
         }
 
-        // Obtener la canción seleccionada pasada a través del Intent
         selectedSong = intent.getParcelableExtra("selectedSong") ?: return
-
-        // Capturar los logs cuando se selecciona una canción
         logSongDetails(selectedSong)
-
-        // Realizar la búsqueda basada en los logs
-        searchSongsByLogs(selectedSong)
+        searchSongs(selectedSong)
     }
 
     private fun onFavoriteClicked(song: Song) {
@@ -98,35 +91,26 @@ class ResultsSearchActivity : AppCompatActivity() {
         Log.d("ResultsSearchActivity", "Selected song details - Name: ${song.name}, Artist: ${song.artist}, Tags: ${song.tags}")
     }
 
-    private fun searchSongsByLogs(selectedSong: Song) {
-        // Obtener la información de los logs
+    private fun searchSongs(selectedSong: Song) {
         val logs = "Name: ${selectedSong.name}, Artist: ${selectedSong.artist}, Tags: ${selectedSong.tags.joinToString(", ")}"
-
-        // Buscar canciones utilizando la información de los logs
         spotifyService.searchSongsByLogs(logs) { songsByLogs ->
             if (songsByLogs != null) {
-                // Filtrar canciones con el mismo nombre que la seleccionada
                 val filteredSongs = songsByLogs.filter { song ->
                     !song.name.equals(selectedSong.name, ignoreCase = true)
                 }
-
-                // Eliminar canciones repetidas basándose en su combinación única de nombre y artista
                 val uniqueSongs = mutableSetOf<Pair<String, String>>()
                 val distinctSongs = filteredSongs.filter { song ->
                     val uniqueKey = Pair(song.name, song.artist)
                     if (uniqueSongs.contains(uniqueKey)) {
-                        false // Ya existe
+                        false
                     } else {
                         uniqueSongs.add(uniqueKey)
-                        true // Es único
+                        true
                     }
                 }
-
-                // Log las canciones resultantes y actualizar la interfaz
                 distinctSongs.take(20).forEach { song ->
                     Log.d("ResultsSearchActivity", "Found song: ${song.name} by ${song.artist}")
                 }
-
                 runOnUiThread {
                     adapter.updateResults(distinctSongs.take(20))
                 }
@@ -136,13 +120,11 @@ class ResultsSearchActivity : AppCompatActivity() {
         }
     }
 
-
     private fun savePlaylist() {
         userEmail?.let { email ->
             val playlistId = "songs_like_${selectedSong.name}_from_${selectedSong.artist}".replace(" ", "_")
             val playlistRef = firestoreDb.collection("users").document(email).collection("playlists").document(playlistId)
 
-            // Crear los datos de la playlist incluyendo las canciones
             val songs = adapter.getSongs().map { song ->
                 mapOf(
                     "name" to song.name,
@@ -153,10 +135,9 @@ class ResultsSearchActivity : AppCompatActivity() {
 
             val playlistData = mapOf(
                 "name" to "Songs like ${selectedSong.name} from ${selectedSong.artist}",
-                "songs" to songs // Guardar todas las canciones en un solo campo
+                "songs" to songs
             )
 
-            // Guardar la playlist con todas las canciones
             playlistRef.set(playlistData)
                 .addOnSuccessListener {
                     Log.d("ResultsSearchActivity", "Playlist document created with all songs")
@@ -169,33 +150,6 @@ class ResultsSearchActivity : AppCompatActivity() {
         }
     }
 
-
-
-
-    private fun saveSongsToPlaylist(playlistRef: DocumentReference) {
-        val songs = adapter.getSongs()
-        val batch = firestoreDb.batch()
-
-        songs.forEach { song ->
-            val songRef = playlistRef.collection("songs").document(song.name.replace(" ", "_"))
-            val songData = mapOf(
-                "name" to song.name,
-                "artist" to song.artist,
-                "tags" to song.tags
-            )
-            batch.set(songRef, songData)
-        }
-
-        batch.commit()
-            .addOnSuccessListener {
-                Log.d("ResultsSearchActivity", "Songs added to playlist successfully")
-                Toast.makeText(this, "Playlist guardada exitosamente", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Log.e("ResultsSearchActivity", "Error al guardar las canciones en la playlist: ${e.message}")
-                Toast.makeText(this, "Error al guardar las canciones en la playlist: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
     private fun goToSearch() {
         val i = Intent(this, SpotifySearchActivity::class.java)
         startActivity(i)
