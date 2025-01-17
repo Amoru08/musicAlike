@@ -71,8 +71,7 @@ class ViewFavoritesActivity : AppCompatActivity() {
 }
 
 class FavoriteSongsAdapter(
-    private val favoriteSongs: List<Song>
-) : RecyclerView.Adapter<FavoriteSongsAdapter.FavoriteSongViewHolder>() {
+    private val favoriteSongs: List<Song>) : RecyclerView.Adapter<FavoriteSongsAdapter.FavoriteSongViewHolder>() {
 
     class FavoriteSongViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val songNameTextView: TextView = view.findViewById(R.id.songNameTextView)

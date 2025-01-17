@@ -43,43 +43,44 @@
 
     <Button
         android:id="@+id/detalles"
-        android:layout_width="219dp"
-        android:layout_height="64dp"
+        android:layout_width="158dp"
+        android:layout_height="60dp"
         android:fontFamily="@font/circular_std_2"
         android:text="Detalles"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.876"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.251"
+        app:layout_constraintVertical_bias="0.279"
         tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/signOutButton"
-        android:layout_width="218dp"
-        android:layout_height="68dp"
+        android:layout_width="165dp"
+        android:layout_height="61dp"
         android:fontFamily="@font/circular_std_2"
         android:text="Cerrar sesion"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.121"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.381"
+        app:layout_constraintVertical_bias="0.279"
         tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/exit"
-        android:layout_width="100dp"
-        android:layout_height="56dp"
+        android:layout_width="129dp"
+        android:layout_height="53dp"
         android:fontFamily="@font/circular_std_2"
         android:text="Salir"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.049"
+        app:layout_constraintHorizontal_bias="0.134"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.616"
+        app:layout_constraintVertical_bias="0.608"
         tools:ignore="MissingConstraints" />
 
     <WebView

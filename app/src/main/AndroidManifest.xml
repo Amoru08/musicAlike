@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- Para Android 11 y superiores, si es necesario acceso completo a archivos -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:targetApi="30" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +22,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicAlike"
         tools:targetApi="31">
+
+        <activity
+            android:name=".userCustomizationActivity"
+            android:requestLegacyExternalStorage="true"
+            android:exported="true" />
         <activity
             android:name=".ViewFavoritesActivity"
             android:exported="true" />
@@ -26,24 +37,28 @@
         <meta-data
             android:name="com.google.android.gms.auth.api.credentials.CREDENTIALS"
             android:value="@string/google_client_id"
-            tools:node="replace" /> <!-- HomeActivity para la redirección de Spotify -->
+            tools:node="replace" />
+
         <activity
             android:name=".HomeActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask">
+            <meta-data
+                android:name="com.google.android.gms.auth.api.signin.LOGIN"
+                android:value="true" />
+        </activity>
 
-            <!-- No es necesario un intent-filter para la actividad principal si se inicia a través de MainActivity -->
-        </activity> <!-- MainActivity como actividad principal -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Actividades adicionales -->
+        </activity>
+
+        <!-- Actividades adicionales -->
         <activity android:name=".si_registrado" />
         <activity android:name=".no_registrado" />
         <activity
@@ -58,20 +73,17 @@
             android:label="Spotify Authentication">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="callback"
-                    android:scheme="musicalike" />
+                <data android:host="callback" android:scheme="musicalike" />
             </intent-filter>
-        </activity> <!-- Actividad ResultsSearchActivity -->
+        </activity>
         <activity
             android:name=".ResultsSearchActivity"
             android:exported="true" />
-        <activity android:name=".PlaylistsActivity"
-            android:exported="true"/>
+        <activity
+            android:name=".PlaylistsActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

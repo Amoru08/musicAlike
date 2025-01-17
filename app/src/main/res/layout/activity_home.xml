@@ -3,24 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@drawable/edittext_custom"
     android:layout_height="match_parent"
+    android:background="@drawable/edittext_custom"
     tools:ignore="MissingClass">
 
-
-    <Button
-        android:id="@+id/favorites"
-        android:layout_width="141dp"
-        android:layout_height="146dp"
-        android:fontFamily="@font/circular_std_2"
-        android:text="Ver canciones favoritas"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.888"
-        app:layout_constraintStart_toStartOf="parent"
+    <!-- Layout para la imagen de perfil y el nombre de usuario -->
+    <LinearLayout
+        android:id="@+id/profileSection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars"
-        app:layout_constraintVertical_bias="0.499" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Imagen de perfil -->
+
+        <!-- Nombre de usuario -->
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="Imagen de perfil"
+            android:src="@drawable/user" />
+
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre de usuario"
+            android:textSize="18sp"
+            android:background="@drawable/edittext_custom" />
+    </LinearLayout>
+
+    <!-- Otros elementos del layout -->
 
     <TextView
         android:id="@+id/textView4"
@@ -35,7 +52,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.061"
+        app:layout_constraintVertical_bias="0.119"
         tools:ignore="MissingConstraints" />
 
     <Button
@@ -51,19 +68,6 @@
         app:layout_constraintVertical_bias="0.98" />
 
     <Button
-        android:id="@+id/buscar"
-        android:layout_width="165dp"
-        android:layout_height="62dp"
-        android:fontFamily="@font/circular_std_2"
-        android:text="Buscar cancion"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.101"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.281" />
-
-    <Button
         android:id="@+id/playlists"
         android:layout_width="141dp"
         android:layout_height="146dp"
@@ -71,10 +75,24 @@
         android:text="Ver playlists guardadas"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.155"
+        app:layout_constraintHorizontal_bias="0.129"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499" />
+
+    <Button
+        android:id="@+id/favorites"
+        android:layout_width="141dp"
+        android:layout_height="146dp"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Ver canciones favoritas"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.851"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/usuario"
@@ -85,22 +103,76 @@
         android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.933"
+        app:layout_constraintHorizontal_bias="0.896"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.284" />
+        app:layout_constraintVertical_bias="0.247" />
 
-    <ImageButton
-        android:id="@+id/imageButton2"
-        android:layout_width="60dp"
-        android:layout_height="52dp"
+    <Button
+        android:id="@+id/buscar"
+        android:layout_width="165dp"
+        android:layout_height="62dp"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Buscar cancion"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.017"
+        app:layout_constraintHorizontal_bias="0.142"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.019"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintVertical_bias="0.248" />
 
+    <ImageButton
+        android:id="@+id/user"
+        android:layout_width="96dp"
+        android:layout_height="92dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/man"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.787"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.764" />
 
+    <!-- TextView debajo del ImageButton para "Personalizar Usuario" -->
+    <TextView
+        android:id="@+id/customizeUserText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Personalizar Usuario"
+        android:fontFamily="@font/circular_std_2"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.871"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user" />
+
+    <ImageButton
+        android:id="@+id/palette"
+        android:layout_width="96dp"
+        android:layout_height="92dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/wheel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.174"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.773" />
+
+    <TextView
+        android:id="@+id/paletteText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Personalizar paleta"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user" />
 </androidx.constraintlayout.widget.ConstraintLayout>

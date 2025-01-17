@@ -34,9 +34,8 @@ class viewPlaylistActivity : AppCompatActivity() {
         exit.setOnClickListener { goToHome() }
 
         adapter = PlaylistAdapter(playlists) { playlist ->
-            // En viewPlaylistActivity (cuando el usuario selecciona una playlist)
             val intent = Intent(this, PlaylistsActivity::class.java)
-            intent.putExtra("playlistId", playlist.id) // Pasar el ID de la playlist seleccionada
+            intent.putExtra("playlistId", playlist.id)
             startActivity(intent)
 
         }
@@ -93,17 +92,14 @@ class PlaylistAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
-        // Inflar el layout del item de playlist
         val view = LayoutInflater.from(parent.context).inflate(R.layout.playlist_view, parent, false)
         return PlaylistViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
         val playlist = playlists[position]
-        // Asignar el nombre de la playlist al TextView
         holder.playlistNameTextView.text = playlist.name
 
-        // Configurar el clic en el CardView
         holder.view.setOnClickListener {
             onPlaylistClicked(playlist)
         }

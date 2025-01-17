@@ -39,25 +39,20 @@ class PlaylistsActivity : AppCompatActivity() {
 
         playlistRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Obtener el correo del usuario autenticado
         val userEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
 
-        // Si no hay usuario autenticado, muestra un mensaje de error
         if (userEmail == null) {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Obtener el ID de la playlist seleccionada desde el Intent
         val playlistId = intent.getStringExtra("playlistId")
         if (playlistId == null) {
             Toast.makeText(this, "No se ha seleccionado ninguna playlist", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Crear el adaptador para las canciones
         val adapter = SongAdapter(songs, userEmail, { song ->
-            // Lógica para manejar clics en el botón de favorito
             song.isFavorite = !song.isFavorite
             Log.d("PlaylistsActivity", "Canción favorita: ${song.name} - ${song.isFavorite}")
         }) { song ->
@@ -66,27 +61,22 @@ class PlaylistsActivity : AppCompatActivity() {
         }
 
         playlistRecyclerView.adapter = adapter
-
-        // Cargar canciones de la playlist seleccionada
         loadSongsFromPlaylist(playlistId, userEmail)
 
         save.setOnClickListener {
             Toast.makeText(this, "Se ha clickado en el botón de guardar", Toast.LENGTH_SHORT).show()
             saveSongsToYouTube()
         }
-    }private fun loadSongsFromPlaylist(playlistId: String, userEmail: String) {
+    }
+    private fun loadSongsFromPlaylist(playlistId: String, userEmail: String) {
         firestoreDb.collection("users")
             .document(userEmail)
             .collection("playlists")
-            .document(playlistId)  // Usar el ID de la playlist que se pasó
+            .document(playlistId)
             .get()
             .addOnSuccessListener { document ->
-                // Verificar si la playlist contiene el campo 'songs'
                 val songsArray = document.get("songs") as? List<Map<String, Any>> ?: return@addOnSuccessListener
-
-                songs.clear()  // Limpiar la lista de canciones antes de agregar las nuevas
-
-                // Recorrer el array de canciones
+                songs.clear()
                 for (songMap in songsArray) {
                     val name = songMap["name"] as? String ?: continue
                     val artist = songMap["artist"] as? String ?: continue
@@ -94,11 +84,7 @@ class PlaylistsActivity : AppCompatActivity() {
                     val song = Song(name = name, artist = artist)
                     songs.add(song)
                 }
-
-                // Notificar al adaptador que los datos han cambiado
                 playlistRecyclerView.adapter?.notifyDataSetChanged()
-
-                // Mostrar mensaje si no hay canciones
                 if (songs.isEmpty()) {
                     Toast.makeText(this, "No hay canciones en la playlist seleccionada", Toast.LENGTH_SHORT).show()
                 }
@@ -108,10 +94,6 @@ class PlaylistsActivity : AppCompatActivity() {
             }
     }
 
-    // Cargar canciones desde Firestore usando el playlistId
-
-
-    // Lógica para subir las canciones a YouTube
     private fun saveSongsToYouTube() {
         val userEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
         if (userEmail == null) {
@@ -124,7 +106,6 @@ class PlaylistsActivity : AppCompatActivity() {
             return
         }
 
-        // Obtener el token de acceso de Google
         val account = GoogleSignIn.getLastSignedInAccount(this)
         val accessToken = account?.serverAuthCode
 
@@ -133,12 +114,10 @@ class PlaylistsActivity : AppCompatActivity() {
             return
         }
 
-        // Usamos un Coroutine para la operación en segundo plano
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val songsToUpload = mutableListOf<Song>()
 
-                // Cargar las canciones de Firestore
                 val result = firestoreDb.collection("users")
                     .document(userEmail)
                     .collection("playlists")
@@ -160,8 +139,6 @@ class PlaylistsActivity : AppCompatActivity() {
                     }
                     return@launch
                 }
-
-                // Crear una playlist en YouTube si no existe (puedes usar una playlist existente)
                 val youtubePlaylistId = createYouTubePlaylist(accessToken, "Mi Playlist desde Musicalike", "Playlist creada automáticamente desde Musicalike")
 
                 if (youtubePlaylistId == null) {
@@ -170,16 +147,12 @@ class PlaylistsActivity : AppCompatActivity() {
                     }
                     return@launch
                 }
-
-                // Buscar y agregar videos a la playlist de YouTube
                 for (song in songsToUpload) {
                     val videoId = searchYouTubeVideo(apiKey = "AIzaSyAUkgeL0z1-owXSORm81ckUZqwqhClOImw", query = "${song.name} ${song.artist}")
                     if (videoId != null) {
                         addVideoToPlaylist(accessToken = accessToken, playlistId = youtubePlaylistId, videoId = videoId)
                     }
                 }
-
-                // Mensaje final
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@PlaylistsActivity, "Canciones cargadas en YouTube", Toast.LENGTH_SHORT).show()
                 }
@@ -191,8 +164,7 @@ class PlaylistsActivity : AppCompatActivity() {
         }
     }
 
-    // Crear la playlist en YouTube
-    suspend fun createYouTubePlaylist(accessToken: String, title: String, description: String): String? {
+     fun createYouTubePlaylist(accessToken: String, title: String, description: String): String? {
         val url = URL("https://www.googleapis.com/youtube/v3/playlists?part=snippet,status")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -224,8 +196,7 @@ class PlaylistsActivity : AppCompatActivity() {
         return null
     }
 
-    // Buscar el video en YouTube
-    suspend fun searchYouTubeVideo(apiKey: String, query: String): String? {
+    fun searchYouTubeVideo(apiKey: String, query: String): String? {
         val url = URL("https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${query.replace(" ", "+")}&key=$apiKey")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -238,15 +209,14 @@ class PlaylistsActivity : AppCompatActivity() {
             if (items.length() > 0) {
                 val firstItem = items.getJSONObject(0)
                 val id = firstItem.getJSONObject("id")
-                return id.getString("videoId") // Devuelve el ID del video encontrado
+                return id.getString("videoId")
             }
         }
 
         return null
     }
 
-    // Agregar el video a la playlist de YouTube
-    suspend fun addVideoToPlaylist(accessToken: String, playlistId: String, videoId: String) {
+    fun addVideoToPlaylist(accessToken: String, playlistId: String, videoId: String) {
         val url = URL("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet")
         val connection = url.openConnection() as HttpURLConnection
 

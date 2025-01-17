@@ -117,6 +117,7 @@ class ResultsSearchActivity : AppCompatActivity() {
             } else {
                 Log.d("ResultsSearchActivity", "No songs found with the given logs.")
             }
+
         }
     }
 
@@ -132,12 +133,10 @@ class ResultsSearchActivity : AppCompatActivity() {
                     "tags" to song.tags
                 )
             }
-
             val playlistData = mapOf(
                 "name" to "Songs like ${selectedSong.name} from ${selectedSong.artist}",
                 "songs" to songs
             )
-
             playlistRef.set(playlistData)
                 .addOnSuccessListener {
                     Log.d("ResultsSearchActivity", "Playlist document created with all songs")
