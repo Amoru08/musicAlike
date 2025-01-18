@@ -37,7 +37,7 @@ class userCustomizationActivity : AppCompatActivity() {
         editUserDescription = findViewById(R.id.editUserDescription)
         profileImage = findViewById(R.id.profileImage)
         btnChangeProfileImage = findViewById(R.id.btnChangeProfileImage)
-        btnSaveChanges = findViewById(R.id.btnSaveChanges)
+        btnSaveChanges = findViewById(R.id.btnSave)
 
         // Cambiar imagen de perfil
         btnChangeProfileImage.setOnClickListener {
@@ -49,28 +49,32 @@ class userCustomizationActivity : AppCompatActivity() {
             val userName = editUserName.text.toString()
             val userDescription = editUserDescription.text.toString()
 
-            if (userName.isBlank() || userDescription.isBlank()) {
-                Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             // Guardar en SharedPreferences
             val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
-            editor.putString("userName", userName)
-            editor.putString("userDescription", userDescription)
+
+            if (userName.isNotBlank()) {
+                editor.putString("userName", userName)
+            }
+
+            if (userDescription.isNotBlank()) {
+                editor.putString("userDescription", userDescription)
+            }
+
             profileImageUri?.let { uri ->
                 editor.putString("profileImageUri", uri.toString())
             }
+
             editor.apply()
 
             // Notificar de los cambios guardados
-            Toast.makeText(this, "Cambios guardados: $userName, $userDescription", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show()
 
             // Finalizar actividad
             setResult(Activity.RESULT_OK)
-            //finish()
+            finish()
         }
+
     }
 
     private fun checkPermissionAndOpenImagePicker() {
@@ -141,10 +145,36 @@ class userCustomizationActivity : AppCompatActivity() {
             val inputStream = contentResolver.openInputStream(imageUri)
             val bitmap = BitmapFactory.decodeStream(inputStream)
             val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, true)
+
+            // Guardar la imagen en almacenamiento interno
+            val fileName = saveProfileImage(resizedBitmap)
+
+            // Guardar el nombre del archivo en SharedPreferences
+            val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putString("profileImageFileName", fileName)
+            editor.apply()
+
+            // Mostrar la imagen en la vista
             profileImage.setImageBitmap(resizedBitmap)
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show()
         }
     }
+
+
+    private fun saveProfileImage(bitmap: Bitmap): String {
+        val fileName = "profile_image.png"
+        try {
+            openFileOutput(fileName, Context.MODE_PRIVATE).use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error al guardar la imagen", Toast.LENGTH_SHORT).show()
+        }
+        return fileName
+    }
+
 }

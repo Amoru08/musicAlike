@@ -2,6 +2,7 @@ package com.example.musicalike
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -88,25 +89,17 @@ class HomeActivity : AppCompatActivity() {
     private fun loadUserProfile() {
         val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
         val userName = sharedPreferences.getString("userName", "Usuario")
-        val profileImageUriString = sharedPreferences.getString("profileImageUri", null)
-
-        // Mostrar datos en la interfaz
         userNameTextView.text = userName
 
-        if (profileImageUriString != null) {
-            try {
-                val profileImageUri = Uri.parse(profileImageUriString)
-                val inputStream = contentResolver.openInputStream(profileImageUri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                profileImageView.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                profileImageView.setImageResource(R.drawable.user) // Imagen por defecto
-            }
+        // Cargar la imagen guardada
+        val bitmap = loadProfileImage()
+        if (bitmap != null) {
+            profileImageView.setImageBitmap(bitmap)
         } else {
             profileImageView.setImageResource(R.drawable.user) // Imagen por defecto
         }
     }
+
 
     private fun showDescriptionDialog() {
         val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
@@ -195,4 +188,16 @@ class HomeActivity : AppCompatActivity() {
             profileImageView.setImageResource(R.drawable.user) // Imagen por defecto
         }
     }
+
+    private fun loadProfileImage(): Bitmap? {
+        return try {
+            val fileName = "profile_image.png"
+            val fileInputStream = openFileInput(fileName)
+            BitmapFactory.decodeStream(fileInputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 }
