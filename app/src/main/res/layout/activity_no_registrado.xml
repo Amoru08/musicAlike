@@ -46,8 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.567"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.508" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/elEmail"
@@ -109,18 +108,6 @@
         app:layout_constraintHorizontal_bias="0.53"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.602" />
+        app:layout_constraintVertical_bias="0.636" />
 
-    <Button
-        android:id="@+id/regisGoogle"
-        android:layout_width="345dp"
-        android:layout_height="54dp"
-        android:fontFamily="@font/circular_std_2"
-        android:text="Registrarse con Google"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.575"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.689" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_primary"
     tools:context=".SpotifySearchActivity">
 
     <!-- Campo de texto para ingresar la búsqueda -->

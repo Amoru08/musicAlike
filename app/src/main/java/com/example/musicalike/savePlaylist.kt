@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -19,7 +18,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-class PlaylistsActivity : AppCompatActivity() {
+class PlaylistsActivity : BaseActivity() {
 
     private val firestoreDb = FirebaseFirestore.getInstance()
     private lateinit var playlistRecyclerView: RecyclerView
@@ -33,7 +32,7 @@ class PlaylistsActivity : AppCompatActivity() {
 
         playlistRecyclerView = findViewById(R.id.songsRecyclerView)
         save = findViewById(R.id.saveButton)
-        exit=findViewById(R.id.backButton)
+        exit = findViewById(R.id.backButton)
 
         exit.setOnClickListener { goBack() }
 
@@ -68,6 +67,7 @@ class PlaylistsActivity : AppCompatActivity() {
             saveSongsToYouTube()
         }
     }
+
     private fun loadSongsFromPlaylist(playlistId: String, userEmail: String) {
         firestoreDb.collection("users")
             .document(userEmail)
@@ -164,7 +164,7 @@ class PlaylistsActivity : AppCompatActivity() {
         }
     }
 
-     fun createYouTubePlaylist(accessToken: String, title: String, description: String): String? {
+    fun createYouTubePlaylist(accessToken: String, title: String, description: String): String? {
         val url = URL("https://www.googleapis.com/youtube/v3/playlists?part=snippet,status")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -242,6 +242,7 @@ class PlaylistsActivity : AppCompatActivity() {
             throw Exception("Error al agregar el video a la playlist")
         }
     }
+
     private fun goBack() {
         finish()
     }

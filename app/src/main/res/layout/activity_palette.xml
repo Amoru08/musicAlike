@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PaletteActivity"
+    android:background="@drawable/edittext_custom">
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/selectColorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecciona un tema"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/circular_std_2"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center" />
+
+    <!-- Contenedor para los botones de los temas -->
+    <LinearLayout
+        android:id="@+id/themeButtonsContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/selectColorText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <!-- Botón Azul Claro -->
+        <Button
+            android:id="@+id/themeBlueButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:fontFamily="@font/circular_std_2"
+            android:background="@drawable/color1"
+            android:text="Morado Claro"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_gravity="center"/>
+
+        <!-- Botón Verde Claro -->
+        <Button
+            android:id="@+id/themeGreenButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:fontFamily="@font/circular_std_2"
+            android:background="@drawable/color2"
+            android:text="Verde Claro"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_gravity="center"/>
+
+        <!-- Botón Rosa Pálido -->
+        <Button
+            android:id="@+id/themePinkButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:fontFamily="@font/circular_std_2"
+            android:background="@drawable/color3"
+            android:text="Rosa Pálido"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <!-- Botón para Restablecer el Tema -->
+    <Button
+        android:id="@+id/resetThemeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Restablecer"
+        android:textSize="16sp"
+        android:background="@drawable/edittext_custom"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@id/themeButtonsContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="12dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30dp" />
+
+    <!-- Botón para Guardar el Tema -->
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Guardar"
+        android:textSize="16sp"
+        android:background="@drawable/edittext_custom"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@id/resetThemeButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="12dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -15,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
-class no_registrado : AppCompatActivity() {
+class no_registrado : BaseActivity() {
 
     private lateinit var login: Button
     private lateinit var regis: Button
@@ -26,6 +25,7 @@ class no_registrado : AppCompatActivity() {
 
     private val requestCodeGoogleSignIn = 9001
     private val firestoreDb = FirebaseFirestore.getInstance()
+    private val defaultPassword = "ContraseñaPredeterminada123" // Contraseña predeterminada
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,51 +35,41 @@ class no_registrado : AppCompatActivity() {
         contra = findViewById(R.id.contrasena)
         regis = findViewById(R.id.regis2)
         login = findViewById(R.id.atras)
-        googleSignUp = findViewById(R.id.regisGoogle) // Nuevo botón para registro con Google
         exit = findViewById(R.id.atras)
 
-        login.setOnClickListener { goToLogin() }
         setup()
 
-        // Configuración para el botón de Google Sign-Up
-        googleSignUp.setOnClickListener { authenticateWithGoogle() }
-
-        // Configuración para el botón de salida
-        exit.setOnClickListener { goToHome() }
+        exit.setOnClickListener { goToMain() }
     }
 
-    private fun goToLogin() {
+    private fun goToMain() {
         val i = Intent(this, MainActivity::class.java)
         startActivity(i)
     }
 
     private fun setup() {
         regis.setOnClickListener {
-            if (email.text.isNotEmpty() && contra.text.isNotEmpty()) {
-                FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.text.toString(), contra.text.toString())
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            goToHome()
-                        } else {
-                            showAlert()
+            val emailInput = email.text.toString().trim()
+            val passwordInput = contra.text.toString().trim()
+
+            if (emailInput.isNotEmpty() && passwordInput.isNotEmpty()) {
+                if (isValidEmail(emailInput)) {
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(emailInput, passwordInput)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                                goToHome() // Ir a la página principal si el registro es exitoso
+                            } else {
+                                showAlert("Error al registrar. Intente nuevamente.")
+                            }
                         }
-                    }
+                } else {
+                    showAlert("Por favor, ingrese un correo válido.")
+                }
             } else {
                 showAlert("Por favor, complete todos los campos.")
             }
         }
-    }
-
-    private fun authenticateWithGoogle() {
-        Log.d("no_registrado", "Iniciando autenticación con Google")
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id)) // Agrega tu ID de cliente web de Firebase
-            .requestEmail()
-            .build()
-
-        val googleSignInClient = GoogleSignIn.getClient(this, gso)
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, requestCodeGoogleSignIn)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -90,11 +80,20 @@ class no_registrado : AppCompatActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 Log.d("no_registrado", "Cuenta de Google: ${account?.displayName}, Email: ${account?.email}")
+                fillCredentials(account) // Rellena los campos con los datos de la cuenta
                 firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
                 Log.e("no_registrado", "Error en la autenticación de Google: ${e.message}")
                 Toast.makeText(this, "Error en la autenticación de Google", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun fillCredentials(account: GoogleSignInAccount?) {
+        account?.let {
+            email.setText(it.email ?: "")
+            contra.setText(defaultPassword) // Rellena con una contraseña predeterminada
+            Toast.makeText(this, "Credenciales rellenadas automáticamente", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -104,7 +103,7 @@ class no_registrado : AppCompatActivity() {
             FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        saveUserDetails(account) // Guarda los detalles del usuario en Firestore
+                        saveUserDetails(account)
                         goToHome()
                     } else {
                         Toast.makeText(this, "Error al registrar con Google", Toast.LENGTH_SHORT).show()
@@ -123,11 +122,9 @@ class no_registrado : AppCompatActivity() {
 
             userDocument.set(mapOf("name" to userName, "email" to userEmail))
                 .addOnSuccessListener {
-                    // Documento del usuario creado/actualizado exitosamente
                     Log.d("no_registrado", "Documento del usuario creado/actualizado exitosamente.")
                 }
                 .addOnFailureListener { e ->
-                    // Manejar el error al crear/actualizar el documento del usuario
                     e.printStackTrace()
                     Log.e("no_registrado", "Error al crear/actualizar el documento del usuario: ${e.message}")
                 }
@@ -139,15 +136,20 @@ class no_registrado : AppCompatActivity() {
         builder.setTitle("Error")
         builder.setMessage(message)
         builder.setPositiveButton("Aceptar", null)
-        builder.setNegativeButton("Cancelar") { _, _ -> goToLogin() }
+        builder.setNegativeButton("Cancelar") { _, _ -> goToHome() }
 
         val dialog: android.app.AlertDialog = builder.create()
         dialog.show()
     }
 
     private fun goToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
+        val intent = Intent(this, HomeActivity::class.java) // Cambia a la actividad que corresponda
         startActivity(intent)
         finish()
     }
+
+    private fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
 }

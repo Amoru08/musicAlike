@@ -17,6 +17,16 @@
     <color name="rojo">#FF0000</color>
     <color name="verde">#008000</color>
 
+    <!-- Colores para el Tema Rosado -->
+    <color name="pink_light">#ffc4e9</color>
+
+    <!-- Colores para el Tema Verde Claro -->
+    <color name="green_light">#c0e7b6</color>
+
+    <!-- Colores para el Tema Morado Claro -->
+    <color name="purple_light">#e3c5e9</color>
+
+
 
 
 </resources>

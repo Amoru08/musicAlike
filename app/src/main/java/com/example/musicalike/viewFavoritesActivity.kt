@@ -9,13 +9,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ViewFavoritesActivity : AppCompatActivity() {
+class ViewFavoritesActivity : BaseActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: FavoriteSongsAdapter
@@ -26,7 +25,7 @@ class ViewFavoritesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_favorites)
-        exit=findViewById(R.id.backButton)
+        exit = findViewById(R.id.backButton)
         recyclerView = findViewById(R.id.favoritesRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -64,6 +63,7 @@ class ViewFavoritesActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al cargar canciones favoritas", Toast.LENGTH_SHORT).show()
             }
     }
+
     private fun goToHome() {
         val i = Intent(this, HomeActivity::class.java)
         startActivity(i)
@@ -71,7 +71,8 @@ class ViewFavoritesActivity : AppCompatActivity() {
 }
 
 class FavoriteSongsAdapter(
-    private val favoriteSongs: List<Song>) : RecyclerView.Adapter<FavoriteSongsAdapter.FavoriteSongViewHolder>() {
+    private val favoriteSongs: List<Song>
+) : RecyclerView.Adapter<FavoriteSongsAdapter.FavoriteSongViewHolder>() {
 
     class FavoriteSongViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val songNameTextView: TextView = view.findViewById(R.id.songNameTextView)

@@ -1,6 +1,7 @@
 package com.example.musicalike
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -12,13 +13,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SpotifyUserActivity : AppCompatActivity() {
+class SpotifyUserActivity : BaseActivity() {
 
     private lateinit var detailButton: Button
     private lateinit var loginButton: Button
     private lateinit var signOutButton: Button
     private lateinit var exit: Button
-
+    private val REQUEST_CODE_PALETTE = 1002
     private val requestCode = 9001
 
     private val firestoreDb = FirebaseFirestore.getInstance()
@@ -57,7 +58,13 @@ class SpotifyUserActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        if (requestCode == REQUEST_CODE_PALETTE && resultCode == RESULT_OK) {
+            val selectedTheme = data?.getStringExtra("selectedTheme")
+            if (selectedTheme != null) {
+                // Aplica el tema seleccionado sin necesidad de reiniciar la actividad
+                applySelectedTheme(selectedTheme)
+            }
+        }
         if (requestCode == this.requestCode) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
@@ -109,6 +116,13 @@ class SpotifyUserActivity : AppCompatActivity() {
                 Toast.makeText(this, "Has cerrado sesión exitosamente", Toast.LENGTH_SHORT).show()
             }
     }
+    private fun applySelectedTheme(selectedTheme: String) {
+        val editor = getSharedPreferences("AppPreferences", MODE_PRIVATE).edit()
+        editor.putString("theme", selectedTheme)
+        editor.apply()
 
+        // Reinicia la actividad para aplicar el tema seleccionado
+        recreate()
+    }
 
 }

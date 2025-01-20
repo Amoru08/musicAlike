@@ -5,11 +5,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SpotifyDetailsActivity : AppCompatActivity() {
+class SpotifyDetailsActivity : BaseActivity() {
 
     private lateinit var userNameTextView: TextView
     private lateinit var userEmailTextView: TextView
@@ -20,7 +19,7 @@ class SpotifyDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_spotify_detail)
 
-        exit=findViewById(R.id.backButton)
+        exit = findViewById(R.id.backButton)
         userNameTextView = findViewById(R.id.userNameTextView)
         userEmailTextView = findViewById(R.id.userEmailTextView)
 
@@ -56,6 +55,7 @@ class SpotifyDetailsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al obtener los detalles: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
     private fun goToBack() {
         val i = Intent(this, SpotifyUserActivity::class.java)
         startActivity(i)

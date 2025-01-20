@@ -6,16 +6,14 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.AuthResult
 
-class si_registrado : AppCompatActivity() {
+class si_registrado : BaseActivity() {
 
     private lateinit var atras: Button
     private lateinit var elEmail: EditText
@@ -23,7 +21,7 @@ class si_registrado : AppCompatActivity() {
     private lateinit var ir: Button
     private lateinit var googleSignInButton: Button
 
-    private val requestCode = 9001  // Código de solicitud para Google Sign-In
+    private val requestCode = 9001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,17 +32,12 @@ class si_registrado : AppCompatActivity() {
         elEmail = findViewById(R.id.elEmail)
         laContra = findViewById(R.id.laContra)
         ir = findViewById(R.id.irHome)
-        googleSignInButton = findViewById(R.id.regisGoogle)
 
         val bundle = intent.extras
         Log.d("si_registrado", "Extras recibidos: $bundle")
 
         setup()
 
-        // Configuración del botón de Google Sign-In
-        googleSignInButton.setOnClickListener {
-            authenticateWithGoogle()
-        }
     }
 
     private fun setup() {
@@ -84,17 +77,6 @@ class si_registrado : AppCompatActivity() {
         val i = Intent(this, HomeActivity::class.java)
         startActivity(i)
         finish()
-    }
-
-    // Método para iniciar sesión con Google
-    private fun authenticateWithGoogle() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .build()
-
-        val googleSignInClient = GoogleSignIn.getClient(this, gso)
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, requestCode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

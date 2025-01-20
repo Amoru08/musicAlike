@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -13,10 +12,9 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
 
     private lateinit var textview: TextView
     private lateinit var back: Button
@@ -25,24 +23,20 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var playlists: Button
     private lateinit var favorites: Button
     private lateinit var personalizationUser: ImageButton
-
+    private lateinit var palette: ImageButton
     private lateinit var profileImageView: ImageView
     private lateinit var userNameTextView: TextView
 
     private val auth = FirebaseAuth.getInstance()
+    private val REQUEST_CODE_PALETTE = 1002
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (auth.currentUser == null) {
-            goToPrincipio()
-            finish()
-            return
-        }
-
         setContentView(R.layout.activity_home)
 
         // Inicializar vistas
+        palette = findViewById(R.id.palette)
         personalizationUser = findViewById(R.id.user)
         textview = findViewById(R.id.textView4)
         back = findViewById(R.id.buttonHome)
@@ -50,40 +44,21 @@ class HomeActivity : AppCompatActivity() {
         user = findViewById(R.id.usuario)
         playlists = findViewById(R.id.playlists)
         favorites = findViewById(R.id.favorites)
-
         profileImageView = findViewById(R.id.profileImage)
         userNameTextView = findViewById(R.id.userName)
 
         // Cargar datos guardados de SharedPreferences
         loadUserProfile()
 
-        search.setOnClickListener {
-            goToBuscar()
-        }
-
-        back.setOnClickListener {
-            goToPrincipio()
-        }
-
-        user.setOnClickListener {
-            startSpotifyAuth()
-        }
-
-        playlists.setOnClickListener {
-            goToPlaylist()
-        }
-
-        favorites.setOnClickListener {
-            goToFavorites()
-        }
-        personalizationUser.setOnClickListener {
-            goToPersonalizationUser()
-        }
-
-        // Mostrar descripción en cuadro de diálogo al hacer clic en la imagen de perfil
-        profileImageView.setOnClickListener {
-            showDescriptionDialog()
-        }
+        // Configurar listeners
+        search.setOnClickListener { goToBuscar() }
+        back.setOnClickListener { goToPrincipio() }
+        user.setOnClickListener { startSpotifyAuth() }
+        playlists.setOnClickListener { goToPlaylist() }
+        favorites.setOnClickListener { goToFavorites() }
+        personalizationUser.setOnClickListener { goToPersonalizationUser() }
+        profileImageView.setOnClickListener { showDescriptionDialog() }
+        palette.setOnClickListener { goToPalette() }
     }
 
     private fun loadUserProfile() {
@@ -100,7 +75,6 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-
     private fun showDescriptionDialog() {
         val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
         val userDescription = sharedPreferences.getString("userDescription", "No hay descripción disponible")
@@ -108,9 +82,7 @@ class HomeActivity : AppCompatActivity() {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage(userDescription)
             .setCancelable(true)
-            .setPositiveButton("Salir") { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton("Salir") { dialog, _ -> dialog.dismiss() }
         val alert = dialogBuilder.create()
         alert.setTitle("Descripción del Usuario")
         alert.show()
@@ -129,6 +101,11 @@ class HomeActivity : AppCompatActivity() {
     private fun goToFavorites() {
         val i = Intent(this, ViewFavoritesActivity::class.java)
         startActivity(i)
+    }
+
+    private fun goToPalette() {
+        val i = Intent(this, PaletteActivity::class.java)
+        startActivityForResult(i, REQUEST_CODE_PALETTE)
     }
 
     private fun goToBuscar() {
@@ -159,33 +136,18 @@ class HomeActivity : AppCompatActivity() {
 
     private fun goToPersonalizationUser() {
         val i = Intent(this, userCustomizationActivity::class.java)
-        startActivity(i)
+        startActivityForResult(i, 1001)
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        // Cargar los datos del perfil
-        val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
-        val userName = sharedPreferences.getString("userName", "Usuario")
-        val profileImageUri = sharedPreferences.getString("profileImageUri", null)
-
-        // Actualizar el nombre de usuario
-        userNameTextView.text = userName
-
-        // Actualizar la imagen de perfil
-        if (profileImageUri != null) {
-            try {
-                val imageUri = Uri.parse(profileImageUri)
-                val inputStream = contentResolver.openInputStream(imageUri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                profileImageView.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                profileImageView.setImageResource(R.drawable.user) // Imagen por defecto
-            }
-        } else {
-            profileImageView.setImageResource(R.drawable.user) // Imagen por defecto
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_PALETTE && resultCode == RESULT_OK) {
+            recreate()
+        }
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            loadUserProfile() // Cargar el perfil actualizado
+        } else if (requestCode == REQUEST_CODE_PALETTE && resultCode == RESULT_OK) {
+            recreate() // Reinicia la actividad para aplicar el nuevo tema
         }
     }
 
@@ -199,5 +161,4 @@ class HomeActivity : AppCompatActivity() {
             null
         }
     }
-
 }

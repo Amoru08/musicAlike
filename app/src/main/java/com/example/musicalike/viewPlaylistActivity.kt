@@ -1,25 +1,23 @@
 package com.example.musicalike
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import android.content.Intent
-import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.firestore.FirebaseFirestore
 
-
-class viewPlaylistActivity : AppCompatActivity() {
+class viewPlaylistActivity : BaseActivity() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var exit : Button
+    private lateinit var exit: Button
     private lateinit var adapter: PlaylistAdapter
     private val firestoreDb = FirebaseFirestore.getInstance()
     private val playlists = mutableListOf<Playlist>()
@@ -28,7 +26,7 @@ class viewPlaylistActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_playlist)
         recyclerView = findViewById(R.id.songsRecyclerView)
-        exit=findViewById(R.id.backButton)
+        exit = findViewById(R.id.backButton)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         exit.setOnClickListener { goToHome() }
@@ -37,12 +35,10 @@ class viewPlaylistActivity : AppCompatActivity() {
             val intent = Intent(this, PlaylistsActivity::class.java)
             intent.putExtra("playlistId", playlist.id)
             startActivity(intent)
-
         }
         recyclerView.adapter = adapter
 
         loadPlaylists()
-
     }
 
     private fun loadPlaylists() {
@@ -70,18 +66,18 @@ class viewPlaylistActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al cargar playlists", Toast.LENGTH_SHORT).show()
             }
     }
+
     private fun goToHome() {
         val i = Intent(this, HomeActivity::class.java)
         startActivity(i)
     }
 }
 
-
-
 data class Playlist(
     val name: String = "",
     val id: String = ""
 )
+
 class PlaylistAdapter(
     private val playlists: List<Playlist>,
     private val onPlaylistClicked: (Playlist) -> Unit
@@ -107,8 +103,3 @@ class PlaylistAdapter(
 
     override fun getItemCount() = playlists.size
 }
-
-
-
-
-

@@ -5,13 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ResultsSearchActivity : AppCompatActivity() {
+class ResultsSearchActivity : BaseActivity() {
 
     private lateinit var songRecyclerView: RecyclerView
     private lateinit var adapter: SongAdapter

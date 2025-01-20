@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <!-- Para Android 11 y superiores, si es necesario acceso completo a archivos -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Para Android 11 y superiores, si es necesario acceso completo a archivos -->
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:targetApi="30" />
 
     <application
@@ -22,11 +20,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicAlike"
         tools:targetApi="31">
-
+        <activity
+            android:name=".PaletteActivity"
+            android:exported="false" />
         <activity
             android:name=".userCustomizationActivity"
-            android:requestLegacyExternalStorage="true"
-            android:exported="true" />
+            android:exported="true"
+            android:requestLegacyExternalStorage="true" />
         <activity
             android:name=".ViewFavoritesActivity"
             android:exported="true" />
@@ -48,17 +48,15 @@
                 android:name="com.google.android.gms.auth.api.signin.LOGIN"
                 android:value="true" />
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Actividades adicionales -->
+        </activity> <!-- Actividades adicionales -->
         <activity android:name=".si_registrado" />
         <activity android:name=".no_registrado" />
         <activity
@@ -73,9 +71,13 @@
             android:label="Spotify Authentication">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="callback" android:scheme="musicalike" />
+
+                <data
+                    android:host="callback"
+                    android:scheme="musicalike" />
             </intent-filter>
         </activity>
         <activity
