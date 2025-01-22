@@ -2,15 +2,18 @@ package com.example.musicalike
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : BaseActivity() {
 
     private lateinit var btnRegis: Button
     private lateinit var btnIni: Button
+    private lateinit var supportEmailTextView: TextView
     private val REQUEST_CODE_PALETTE = 1002
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -27,6 +30,7 @@ class MainActivity : BaseActivity() {
         // Inicialización de vistas
         btnRegis = findViewById(R.id.regis)
         btnIni = findViewById(R.id.inicio)
+        supportEmailTextView = findViewById(R.id.supportEmail)
 
         // Configuración de listeners
         btnRegis.setOnClickListener {
@@ -36,6 +40,14 @@ class MainActivity : BaseActivity() {
         btnIni.setOnClickListener {
             Log.d("MainActivity", "Botón 'Iniciar Sesión' presionado")
             goToInicioSesion()
+        }
+
+        supportEmailTextView.setOnClickListener {
+            // Crear un Intent para abrir el cliente de correo
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:musicalikesoporte@gmail.com") // Dirección de correo
+            }
+            startActivity(intent) // Iniciar la actividad
         }
     }
 
@@ -76,7 +88,6 @@ class MainActivity : BaseActivity() {
         editor.putString("theme", selectedTheme)
         editor.apply()
 
-        // Reinicia la actividad para aplicar el tema seleccionado
         recreate()
     }
 }

@@ -81,8 +81,6 @@ class si_registrado : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        // Si la solicitud es de Google Sign-In
         if (requestCode == this.requestCode) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
@@ -96,7 +94,6 @@ class si_registrado : BaseActivity() {
         }
     }
 
-    // Autenticación con Firebase usando la cuenta de Google
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
         account?.let {
             val credential = GoogleAuthProvider.getCredential(it.idToken, null)

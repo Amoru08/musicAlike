@@ -43,13 +43,12 @@ class SpotifySearchActivity : BaseActivity() {
             mutableListOf(),
             userEmail!!,
             onFavoriteClicked = { song -> onFavoriteClicked(song) },
-            onSongClicked = { song -> navigateToResults(song) } // Pasar el callback para el click en la canción
+            onSongClicked = { song -> navigateToResults(song) }
         )
         resultsRecyclerView.layoutManager = LinearLayoutManager(this)
         resultsRecyclerView.adapter = adapter
 
         exit.setOnClickListener { goToHome() }
-
         val searchButton: Button = findViewById(R.id.searchButton)
         searchButton.setOnClickListener {
             val query = searchField.text.toString()
@@ -188,7 +187,6 @@ class SpotifySearchActivity : BaseActivity() {
                 .get()
                 .addOnSuccessListener { documents ->
                     if (documents.isEmpty) {
-                        // Agregar a favoritos
                         spotifyService.getArtistGenres(song.artist) { genres ->
                             Log.d("SpotifySearchActivity", "Genres from Spotify: $genres")
                             if (genres != null) {
@@ -196,7 +194,7 @@ class SpotifySearchActivity : BaseActivity() {
                                     "Nombre" to cleanedSongName,
                                     "Artista" to song.artist,
                                     "Tags" to genres,
-                                    "YoutubeUrl" to song.youtubeUrl // Guardar URL de YouTube
+                                    "YoutubeUrl" to song.youtubeUrl
                                 )
 
                                 userRef.add(favoriteSong)
@@ -211,7 +209,6 @@ class SpotifySearchActivity : BaseActivity() {
                             }
                         }
                     } else {
-                        // Eliminar de favoritos
                         for (document in documents) {
                             userRef.document(document.id).delete()
                                 .addOnSuccessListener {
@@ -232,12 +229,6 @@ class SpotifySearchActivity : BaseActivity() {
                 }
         }
     }
-
-    private fun onSongClicked(song: Song) {
-        Log.d("SpotifySearchActivity", "Song clicked: ${song.name} by ${song.artist}")
-        navigateToResults(song)
-    }
-
     private fun navigateToResults(song: Song) {
         val intent = Intent(this, ResultsSearchActivity::class.java)
         intent.putExtra("selectedSong", song)

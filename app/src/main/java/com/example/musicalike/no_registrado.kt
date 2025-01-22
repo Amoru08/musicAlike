@@ -25,8 +25,6 @@ class no_registrado : BaseActivity() {
 
     private val requestCodeGoogleSignIn = 9001
     private val firestoreDb = FirebaseFirestore.getInstance()
-    private val defaultPassword = "ContraseñaPredeterminada123" // Contraseña predeterminada
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_no_registrado)
@@ -80,8 +78,6 @@ class no_registrado : BaseActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 Log.d("no_registrado", "Cuenta de Google: ${account?.displayName}, Email: ${account?.email}")
-                fillCredentials(account) // Rellena los campos con los datos de la cuenta
-                firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
                 Log.e("no_registrado", "Error en la autenticación de Google: ${e.message}")
                 Toast.makeText(this, "Error en la autenticación de Google", Toast.LENGTH_SHORT).show()
@@ -89,13 +85,6 @@ class no_registrado : BaseActivity() {
         }
     }
 
-    private fun fillCredentials(account: GoogleSignInAccount?) {
-        account?.let {
-            email.setText(it.email ?: "")
-            contra.setText(defaultPassword) // Rellena con una contraseña predeterminada
-            Toast.makeText(this, "Credenciales rellenadas automáticamente", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
         account?.let {
@@ -143,7 +132,7 @@ class no_registrado : BaseActivity() {
     }
 
     private fun goToHome() {
-        val intent = Intent(this, HomeActivity::class.java) // Cambia a la actividad que corresponda
+        val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
         finish()
     }

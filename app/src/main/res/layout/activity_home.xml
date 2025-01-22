@@ -7,7 +7,6 @@
     android:background="@drawable/edittext_custom"
     tools:ignore="MissingClass">
 
-    <!-- Layout para la imagen de perfil y el nombre de usuario -->
     <LinearLayout
         android:id="@+id/profileSection"
         android:layout_width="wrap_content"
@@ -17,9 +16,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Imagen de perfil -->
-
-        <!-- Nombre de usuario -->
         <ImageView
             android:id="@+id/profileImage"
             android:layout_width="50dp"
@@ -35,8 +31,6 @@
             android:text="Nombre de usuario"
             android:textSize="18sp"/>
     </LinearLayout>
-
-    <!-- Otros elementos del layout -->
 
     <TextView
         android:id="@+id/textView4"
@@ -95,30 +89,30 @@
 
     <Button
         android:id="@+id/usuario"
-        android:layout_width="169dp"
-        android:layout_height="58dp"
+        android:layout_width="173dp"
+        android:layout_height="56dp"
         android:fontFamily="@font/circular_std_2"
         android:text="Agregar Usuario"
         android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.896"
+        app:layout_constraintHorizontal_bias="0.861"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.247" />
+        app:layout_constraintVertical_bias="0.252" />
 
     <Button
         android:id="@+id/buscar"
-        android:layout_width="165dp"
-        android:layout_height="62dp"
+        android:layout_width="175dp"
+        android:layout_height="54dp"
         android:fontFamily="@font/circular_std_2"
         android:text="Buscar cancion"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.142"
+        app:layout_constraintHorizontal_bias="0.067"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.248" />
+        app:layout_constraintVertical_bias="0.253" />
 
     <ImageButton
         android:id="@+id/user"
@@ -133,7 +127,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.764" />
 
-    <!-- TextView debajo del ImageButton para "Personalizar Usuario" -->
     <TextView
         android:id="@+id/customizeUserText"
         android:layout_width="wrap_content"

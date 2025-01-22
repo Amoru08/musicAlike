@@ -22,9 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="16dp" /> <!-- Usé layout_marginTop en vez de layout_constraintMarginTop -->
-
-    <!-- Nombre de Usuario -->
+        android:layout_marginTop="16dp" />
     <EditText
         android:id="@+id/editUserName"
         android:layout_width="0dp"
@@ -39,7 +37,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-    <!-- Imagen de Perfil -->
     <ImageView
         android:id="@+id/profileImage"
         android:layout_width="100dp"
@@ -52,11 +49,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editUserName" />
 
-    <!-- Botón Cambiar Imagen -->
-
-    <!-- Descripción del Usuario -->
-
-    <!-- Botón Guardar Cambios -->
     <Button
         android:id="@+id/btnChangeProfileImage"
         android:layout_width="wrap_content"

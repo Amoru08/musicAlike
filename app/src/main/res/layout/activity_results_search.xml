@@ -7,7 +7,6 @@
     android:background="@color/light_primary"
     tools:context=".ResultsSearchActivity">
 
-    <!-- RelativeLayout to position the button at the top right -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +22,6 @@
             android:layout_alignParentTop="true" />
     </RelativeLayout>
 
-    <!-- RecyclerView to display the list of songs -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/songRecyclerView"
         android:layout_width="match_parent"
@@ -32,7 +30,6 @@
         android:padding="16dp"
         tools:listitem="@layout/activity_song" />
 
-    <!-- Botón de Atrás -->
     <Button
         android:id="@+id/backButton"
         android:layout_width="wrap_content"

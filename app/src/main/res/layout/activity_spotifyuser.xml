@@ -6,7 +6,6 @@
     android:background="@drawable/edittext_custom"
     android:layout_height="match_parent">
 
-    <!-- EditText para el correo electrónico de Spotify -->
     <EditText
         android:id="@+id/emailSpotify"
         android:layout_width="412dp"
@@ -18,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- EditText para la contraseña de Spotify -->
     <EditText
         android:id="@+id/passwSpotify"
         android:layout_width="0dp"

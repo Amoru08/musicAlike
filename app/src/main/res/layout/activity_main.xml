@@ -8,51 +8,78 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- Texto Email de soporte -->
     <TextView
         android:id="@+id/textView3"
-        android:layout_width="371dp"
-        android:layout_height="108dp"
-        android:text="Bienvenido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
         android:fontFamily="@font/circular_std_2"
-        android:textColor="#074086"
-        android:textSize="70dp"
+        android:text="Bienvenido"
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="#074086"
+        android:textSize="65sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.659"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.054" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/regis"
-        android:layout_width="376dp"
+        android:layout_width="0dp"
         android:layout_height="55dp"
-        android:text="Registrarse"
-        android:textSize="20dp"
-        android:background="@color/dark_primary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="108dp"
+        android:background="@drawable/edittext_custom"
         android:fontFamily="@font/circular_std_2"
-        app:layout_constraintVertical_bias="0.322" />
-
+        android:text="Registrarse"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView3" />
 
     <Button
         android:id="@+id/inicio"
-        android:layout_width="376dp"
+        android:layout_width="0dp"
         android:layout_height="55dp"
-        android:background="@color/dark_primary"
-        android:text="Inicio de Sesion"
-        android:textSize="20dp"
+        android:layout_marginTop="72dp"
+        android:background="@drawable/edittext_custom"
         android:fontFamily="@font/circular_std_2"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Inicio de Sesion"
+        android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.628"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.47" />
+        app:layout_constraintTop_toBottomOf="@id/regis" />
 
+    <!-- Email con autoLink para que sea clickable -->
+    <TextView
+        android:id="@+id/supportEmailTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="372dp"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Email de soporte"
+        android:textAlignment="center"
+        android:textColor="#074086"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inicio" />
+
+    <TextView
+        android:id="@+id/supportEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:autoLink="email"
+        android:fontFamily="@font/circular_std_2"
+        android:text="musicalikesoporte@gmail.com"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="25sp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/supportEmailTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

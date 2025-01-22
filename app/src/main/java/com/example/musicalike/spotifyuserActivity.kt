@@ -61,7 +61,6 @@ class SpotifyUserActivity : BaseActivity() {
         if (requestCode == REQUEST_CODE_PALETTE && resultCode == RESULT_OK) {
             val selectedTheme = data?.getStringExtra("selectedTheme")
             if (selectedTheme != null) {
-                // Aplica el tema seleccionado sin necesidad de reiniciar la actividad
                 applySelectedTheme(selectedTheme)
             }
         }
@@ -88,11 +87,9 @@ class SpotifyUserActivity : BaseActivity() {
 
             userDocument.set(mapOf("name" to userName, "email" to userEmail))
                 .addOnSuccessListener {
-                    // Documento del usuario creado/actualizado exitosamente
                     Log.d("SpotifyUserActivity", "Documento del usuario creado/actualizado exitosamente.")
                 }
                 .addOnFailureListener { e ->
-                    // Manejar el error al crear/actualizar el documento del usuario
                     e.printStackTrace()
                     Log.e("SpotifyUserActivity", "Error al crear/actualizar el documento del usuario: ${e.message}")
                 }
@@ -120,8 +117,6 @@ class SpotifyUserActivity : BaseActivity() {
         val editor = getSharedPreferences("AppPreferences", MODE_PRIVATE).edit()
         editor.putString("theme", selectedTheme)
         editor.apply()
-
-        // Reinicia la actividad para aplicar el tema seleccionado
         recreate()
     }
 

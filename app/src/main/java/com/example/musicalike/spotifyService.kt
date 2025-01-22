@@ -10,7 +10,6 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
     private val client = OkHttpClient()
     private var accessToken: String? = null
 
-    // Método para obtener el token de acceso
     private fun getAccessToken(callback: (String?) -> Unit) {
         if (accessToken != null) {
             callback(accessToken)
@@ -52,7 +51,6 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
         })
     }
 
-    // Método para buscar canciones por logs
     fun searchSongsByLogs(logs: String, callback: (List<Song>?) -> Unit) {
         getAccessToken { accessToken ->
             if (accessToken == null) {
@@ -89,7 +87,7 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
                             val song = Song(
                                 name = track.getString("name"),
                                 artist = track.getJSONArray("artists").getJSONObject(0).getString("name"),
-                                tags = listOf() // No tags, assuming tags come from the search query
+                                tags = listOf()
                             )
                             songs.add(song)
                         }
@@ -181,54 +179,5 @@ class SpotifyService(private val clientId: String, private val clientSecret: Str
             }
         })
     }
-    fun searchSongsByTags(tags: List<String>, callback: (List<Song>?) -> Unit) {
-        getAccessToken { accessToken ->
-            if (accessToken == null) {
-                callback(null)
-                return@getAccessToken
-            }
 
-            val tagsJoined = tags.joinToString(" ")
-            val searchUrl = "https://api.spotify.com/v1/search?q=$tagsJoined&type=track&limit=20"
-            val request = Request.Builder()
-                .url(searchUrl)
-                .addHeader("Authorization", "Bearer $accessToken")
-                .build()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    e.printStackTrace()
-                    callback(null)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (!response.isSuccessful) {
-                        callback(null)
-                        return
-                    }
-
-                    val responseBody = response.body?.string()
-                    responseBody?.let {
-                        val json = JSONObject(it)
-                        val tracks = json.getJSONObject("tracks").getJSONArray("items")
-                        val songs = mutableListOf<Song>()
-
-                        for (i in 0 until tracks.length()) {
-                            val track = tracks.getJSONObject(i)
-                            val song = Song(
-                                name = track.getString("name").replace(Regex("\\s*\\([^)]*\\)\\s*"), "").trim(), // Limpiar el nombre de la canción
-                                artist = track.getJSONArray("artists").getJSONObject(0).getString("name"),
-                                tags = listOf() // Assuming tags are not directly available from the API
-                            )
-                            songs.add(song)
-                        }
-
-                        callback(songs)
-                    } ?: run {
-                        callback(null)
-                    }
-                }
-            })
-        }
-    }
 }

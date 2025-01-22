@@ -95,17 +95,6 @@ class PlaylistsActivity : BaseActivity() {
     }
 
     private fun saveSongsToYouTube() {
-        val userEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
-        if (userEmail == null) {
-            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val selectedPlaylistId = intent.getStringExtra("playlistId") ?: run {
-            Toast.makeText(this, "No hay playlists seleccionadas", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         val account = GoogleSignIn.getLastSignedInAccount(this)
         val accessToken = account?.serverAuthCode
 
@@ -118,8 +107,15 @@ class PlaylistsActivity : BaseActivity() {
             try {
                 val songsToUpload = mutableListOf<Song>()
 
+                val selectedPlaylistId = intent.getStringExtra("playlistId") ?: run {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@PlaylistsActivity, "No hay playlists seleccionadas", Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
+
                 val result = firestoreDb.collection("users")
-                    .document(userEmail)
+                    .document(account.email ?: "")
                     .collection("playlists")
                     .document(selectedPlaylistId)
                     .collection("songs")
@@ -139,6 +135,7 @@ class PlaylistsActivity : BaseActivity() {
                     }
                     return@launch
                 }
+
                 val youtubePlaylistId = createYouTubePlaylist(accessToken, "Mi Playlist desde Musicalike", "Playlist creada automáticamente desde Musicalike")
 
                 if (youtubePlaylistId == null) {
@@ -147,15 +144,18 @@ class PlaylistsActivity : BaseActivity() {
                     }
                     return@launch
                 }
+
                 for (song in songsToUpload) {
-                    val videoId = searchYouTubeVideo(apiKey = "AIzaSyAUkgeL0z1-owXSORm81ckUZqwqhClOImw", query = "${song.name} ${song.artist}")
+                    val videoId = searchYouTubeVideo(apiKey = "YOUR_YOUTUBE_API_KEY", query = "${song.name} ${song.artist}")
                     if (videoId != null) {
                         addVideoToPlaylist(accessToken = accessToken, playlistId = youtubePlaylistId, videoId = videoId)
                     }
                 }
+
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@PlaylistsActivity, "Canciones cargadas en YouTube", Toast.LENGTH_SHORT).show()
                 }
+
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@PlaylistsActivity, "Error al cargar canciones a YouTube: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -190,7 +190,7 @@ class PlaylistsActivity : BaseActivity() {
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val response = connection.inputStream.bufferedReader().use { it.readText() }
             val jsonResponse = JSONObject(response)
-            return jsonResponse.getString("id") // Devuelve el ID de la playlist creada
+            return jsonResponse.getString("id")
         }
 
         return null

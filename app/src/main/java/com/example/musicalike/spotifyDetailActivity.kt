@@ -24,11 +24,8 @@ class SpotifyDetailsActivity : BaseActivity() {
         userEmailTextView = findViewById(R.id.userEmailTextView)
 
         exit.setOnClickListener { goToBack() }
-
         val currentUserEmail = GoogleSignIn.getLastSignedInAccount(this)?.email
-
         if (currentUserEmail != null) {
-            // Obtener los detalles del usuario desde Firestore
             getUserDetailsFromFirestore(currentUserEmail)
         } else {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
@@ -43,8 +40,6 @@ class SpotifyDetailsActivity : BaseActivity() {
                 if (documentSnapshot.exists()) {
                     val userName = documentSnapshot.getString("name")
                     val userEmail = documentSnapshot.getString("email")
-
-                    // Mostrar los datos en las vistas
                     userNameTextView.text = "Nombre: $userName"
                     userEmailTextView.text = "Correo: $userEmail"
                 } else {

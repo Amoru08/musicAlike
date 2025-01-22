@@ -35,7 +35,6 @@ class HomeActivity : BaseActivity() {
 
         setContentView(R.layout.activity_home)
 
-        // Inicializar vistas
         palette = findViewById(R.id.palette)
         personalizationUser = findViewById(R.id.user)
         textview = findViewById(R.id.textView4)
@@ -47,10 +46,8 @@ class HomeActivity : BaseActivity() {
         profileImageView = findViewById(R.id.profileImage)
         userNameTextView = findViewById(R.id.userName)
 
-        // Cargar datos guardados de SharedPreferences
         loadUserProfile()
 
-        // Configurar listeners
         search.setOnClickListener { goToBuscar() }
         back.setOnClickListener { goToPrincipio() }
         user.setOnClickListener { startSpotifyAuth() }
@@ -65,13 +62,11 @@ class HomeActivity : BaseActivity() {
         val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
         val userName = sharedPreferences.getString("userName", "Usuario")
         userNameTextView.text = userName
-
-        // Cargar la imagen guardada
         val bitmap = loadProfileImage()
         if (bitmap != null) {
             profileImageView.setImageBitmap(bitmap)
         } else {
-            profileImageView.setImageResource(R.drawable.user) // Imagen por defecto
+            profileImageView.setImageResource(R.drawable.user)
         }
     }
 
@@ -141,13 +136,10 @@ class HomeActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_PALETTE && resultCode == RESULT_OK) {
-            recreate()
-        }
         if (requestCode == 1001 && resultCode == RESULT_OK) {
-            loadUserProfile() // Cargar el perfil actualizado
+            loadUserProfile()
         } else if (requestCode == REQUEST_CODE_PALETTE && resultCode == RESULT_OK) {
-            recreate() // Reinicia la actividad para aplicar el nuevo tema
+            recreate()
         }
     }
 

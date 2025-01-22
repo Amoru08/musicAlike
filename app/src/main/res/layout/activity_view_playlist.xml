@@ -6,7 +6,6 @@
     android:background="@color/light_primary"
     android:layout_height="match_parent">
 
-    <!-- RecyclerView para las canciones -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/songsRecyclerView"
         android:layout_width="0dp"

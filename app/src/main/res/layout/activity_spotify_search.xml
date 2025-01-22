@@ -8,7 +8,6 @@
     android:background="@color/light_primary"
     tools:context=".SpotifySearchActivity">
 
-    <!-- Campo de texto para ingresar la búsqueda -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchInputLayout"
         android:layout_width="match_parent"

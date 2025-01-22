@@ -15,7 +15,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Nombre de la canción -->
         <TextView
             android:id="@+id/songNameTextView"
             android:layout_width="wrap_content"
@@ -24,7 +23,6 @@
             android:textColor="#000000"
             android:text="Nombre de la canción"/>
 
-        <!-- Nombre del artista -->
         <TextView
             android:id="@+id/artistNameTextView"
             android:layout_width="wrap_content"
@@ -33,7 +31,6 @@
             android:textColor="#777777"
             android:text="Nombre del artista"/>
 
-        <!-- Botón de favoritos -->
         <ImageView
             android:id="@+id/favoriteButton"
             android:layout_width="wrap_content"

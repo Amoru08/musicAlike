@@ -7,23 +7,6 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/elEmail"
-        android:layout_width="321dp"
-        android:layout_height="50dp"
-        android:background="@drawable/edittext_custom"
-        android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.366"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.17"
-        tools:ignore="MissingConstraints" />
-
-    <EditText
         android:id="@+id/laContra"
         android:layout_width="321dp"
         android:layout_height="48dp"
@@ -35,25 +18,25 @@
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.366"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.304"
+        app:layout_constraintVertical_bias="0.399"
         tools:ignore="MissingConstraints" />
 
-    <Button
-        android:id="@+id/atras2"
-        android:layout_width="153dp"
-        android:layout_height="47dp"
+    <EditText
+        android:id="@+id/elEmail"
+        android:layout_width="321dp"
+        android:layout_height="50dp"
         android:background="@drawable/edittext_custom"
-        android:fontFamily="@font/circular_std_2"
-        android:text="Atras"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.155"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.598"
+        app:layout_constraintVertical_bias="0.266"
         tools:ignore="MissingConstraints" />
 
     <Button
@@ -68,7 +51,37 @@
         app:layout_constraintHorizontal_bias="0.838"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.598"
+        app:layout_constraintVertical_bias="0.642"
         tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/atras2"
+        android:layout_width="153dp"
+        android:layout_height="47dp"
+        android:background="@drawable/edittext_custom"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Atras"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.155"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.642"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="351dp"
+        android:layout_height="122dp"
+        android:fontFamily="@font/circular_std_2"
+        android:text="Inicio de Sesión"
+        android:textAlignment="center"
+        android:textSize="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.333"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.042" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
