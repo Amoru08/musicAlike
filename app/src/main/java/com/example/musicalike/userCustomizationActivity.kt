@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.*
@@ -26,6 +27,18 @@ class userCustomizationActivity : BaseActivity() {
 
     private val PICK_IMAGE_REQUEST_CODE = 1002
     private var profileImageUri: Uri? = null
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("permissionRequested", true)
+            editor.apply()
+            openImagePicker()
+        } else {
+            Toast.makeText(this, "Permiso denegado. Habilítalo en configuraciones.", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,22 +76,31 @@ class userCustomizationActivity : BaseActivity() {
     }
 
     private fun checkPermissionAndOpenImagePicker() {
-        val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
-        val permissionRequested = sharedPreferences.getBoolean("permissionRequested", false)
-
-        if (permissionRequested) {
-            openImagePicker()
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
         } else {
-            showPermissionRequestDialog()
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        when {
+            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED -> {
+                openImagePicker()
+            }
+            shouldShowRequestPermissionRationale(permission) -> {
+                showPermissionRequestDialog(permission)
+            }
+            else -> {
+                requestPermissionLauncher.launch(permission)
+            }
         }
     }
 
-    private fun showPermissionRequestDialog() {
+    private fun showPermissionRequestDialog(permission: String) {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage("Esta aplicación necesita acceso a tus fotos para cambiar la imagen de perfil. ¿Deseas otorgar el permiso?")
             .setCancelable(false)
             .setPositiveButton("Aceptar") { _, _ ->
-                requestPermission()
+                requestPermissionLauncher.launch(permission)
             }
             .setNegativeButton("Denegar") { dialog, _ ->
                 dialog.cancel()
@@ -87,22 +109,6 @@ class userCustomizationActivity : BaseActivity() {
         val alert = dialogBuilder.create()
         alert.setTitle("Solicitud de permiso")
         alert.show()
-    }
-
-    private fun requestPermission() {
-        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            val sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-            editor.putBoolean("permissionRequested", true)
-            editor.apply()
-            openImagePicker()
-        } else {
-            Toast.makeText(this, "Permiso denegado. Habilítalo en configuraciones.", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun openImagePicker() {
